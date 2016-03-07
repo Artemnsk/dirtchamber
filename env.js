@@ -33,7 +33,7 @@ Environment.prototype.settle = function (strategy) {
     if (typeof strategy == 'undefined') {
         strategy = {
             type: 'random',
-            data: {startingPopulation: 10000}
+            data: {startingPopulation: 1500}
         }
     }
     switch (strategy.type) {
