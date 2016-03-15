@@ -1,3 +1,6 @@
+const DEATH_PROBABILITY = 0.005;
+const BIRTH_PROBABILITY = 0.005;
+
 /**
  * Microbe constructor.
  * @param x
@@ -27,18 +30,10 @@ Microbe.prototype.live = function() {
  */
 Microbe.prototype.move = function() {
     // Pop the microbe from its environment cell.
-    for (var index in this.env.env[this.x][this.y]) {
-        if (this === this.env.env[this.x][this.y][index]) {
-            this.env.env[this.x][this.y].splice(index, 1);
-            if (this.env.env[this.x][this.y].length === 0) {
-                delete this.env.env[this.x][this.y];
-                if (this.env.env[this.x].length === 0) {
-                    delete this.env.env[this.x];
-                }
-            }
-            break;
-        }
-    }
+    var index = this.env.env[this.x][this.y].indexOf(this);
+    this.env.env[this.x][this.y].splice(index, 1);
+    // Clean up env array.
+    this.env.cleanupEnv(this.x, this.y);
 
     // Move microbe.
     var direction = {
@@ -75,29 +70,27 @@ Microbe.prototype.eat = function() {
 
 };
 
-
+/**
+ * Microbe creates a new one at the same position as itself.
+ */
 Microbe.prototype.reproduce = function() {
-    var probability_of_death = Math.random();
-    if (probability_of_death <= 0.005) {
+    if (Math.random() <= BIRTH_PROBABILITY) {
         var microbe = new Microbe(this.x, this.y, this.env);
         this.env.env[this.x][this.y].push(microbe);
         this.env.microbes.push(microbe);
     }
 };
 
+/**
+ * Microbe dies and removed from the environment.
+ */
 Microbe.prototype.die = function() {
-    var probability_of_death = Math.random();
-    if (probability_of_death <= 0.005) {
-        for (var index in this.env.env[this.x][this.y]) {
-            if (this === this.env.env[this.x][this.y][index]) {
-                this.env.env[this.x][this.y].splice(index, 1);
-
-            }
-        }
-        for (index in this.env.microbes) {
-            if (this === this.env.microbes[index]) {
-                this.env.microbes.splice(index, 1);
-            }
-        }
+    if (Math.random() <= DEATH_PROBABILITY) {
+        var index = this.env.microbes.indexOf(this);
+        this.env.microbes.splice(index, 1);
+        index = this.env.env[this.x][this.y].indexOf(this);
+        this.env.env[this.x][this.y].splice(index, 1);
+        // Clean up env array.
+        this.env.cleanupEnv(this.x, this.y);
     }
 };

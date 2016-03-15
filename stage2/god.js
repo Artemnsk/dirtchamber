@@ -7,6 +7,7 @@
 function randomNumberFromRange(min,max){
     return Math.floor(Math.random()*(max-min)+min);
 }
+
 var chartUpdateRate = 12;
 var chartUpdateCounter = 0;
 var chartDotCount = 20;
@@ -17,6 +18,7 @@ mainEnv.settle();
 setInterval(function() {
     mainEnv.step();
     mainEnv.draw();
+    // Draw chart.
     chartUpdateCounter++;
     if(chartUpdateCounter == chartUpdateRate) {
         var chart = $('#container').highcharts();

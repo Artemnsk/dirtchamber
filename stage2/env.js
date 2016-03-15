@@ -1,3 +1,5 @@
+const STARTING_POPULATION = 10000;
+
 /**
  * Environment constructor.
  * @param x
@@ -16,14 +18,9 @@ var Environment = function (x, y) {
         y = 400;
     }
     this.maxY = y;
+
     // Initialize environment array.
     this.env = [];
-    //for (var _x = 0; _x < x; _x++) {
-    //    this.env[_x] = [];
-    //    for (var _y = 0; _y < y; _y++) {
-    //        this.env[_x][_y] = null;
-    //    }
-    //}
 };
 
 /**
@@ -34,14 +31,14 @@ Environment.prototype.settle = function (strategy) {
     if (typeof strategy == 'undefined') {
         strategy = {
             type: 'random',
-            data: {startingPopulation: 10000}
+            data: {startingPopulation: STARTING_POPULATION}
         }
     }
 
     switch (strategy.type) {
         case 'random':
         default:
-            this.microbes = new Array();
+            this.microbes = [];
             for (var i = 0; i < strategy.data.startingPopulation; i++) {
                 var x = randomNumberFromRange(this.minX, this.maxX);
                 var y = randomNumberFromRange(this.minY, this.maxY);
@@ -70,10 +67,8 @@ Environment.prototype.draw = function() {
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
     for (var x in this.env) {
         for (var y in this.env[x]) {
-            for (var index in this.env[x][y]) {
-                ctx.fillRect(x * scale, y * scale, scale, scale);
-                break;
-            }
+            // Since we delete any empty array in env we can safely assume that we've got at this x and y a microbe.
+            ctx.fillRect(x * scale, y * scale, scale, scale);
         }
     }
 };
@@ -84,5 +79,19 @@ Environment.prototype.draw = function() {
 Environment.prototype.step = function() {
     for (var index in this.microbes) {
         this.microbes[index].live();
+    }
+};
+
+/**
+ * Clean up env array at position (x,y).
+ * @param x
+ * @param y
+ */
+Environment.prototype.cleanupEnv = function(x, y) {
+    if (!this.env[x][y].length) {
+        delete this.env[x][y];
+        if (!this.env[x].length) {
+            delete this.env[x];
+        }
     }
 };
