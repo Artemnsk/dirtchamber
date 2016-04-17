@@ -1,6 +1,3 @@
-const DEATH_PROBABILITY = 0.005;
-const BIRTH_PROBABILITY = 0.005;
-
 /**
  * Microbe constructor.
  * @param x
