@@ -22,6 +22,7 @@ var Environment = function (x, y) {
 
     // Initialize environment array.
     this.env = [];
+    this.foodLayer = [];
 };
 
 /**
@@ -46,21 +47,15 @@ Environment.prototype.draw = function() {
 
     var scale = 2;
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
+    for (var x in this.foodLayer)
+        for (var y in this.foodLayer[x]) {
+            ctx.fillStyle = "#08685E";
+            ctx.fillRect(x * scale, y * scale, scale, scale);
+        }
     for (var x in this.env) {
         for (var y in this.env[x]) {
-          var food_here = false;
-          for(var z in this.env[x][y]){
-            if (this.env[x][y][z] instanceof Food)
-              food_here = true;
-        }
-            // Since we delete any empty array in env we can safely assume that we've got at this x and y a microbe.
-            if(food_here){
-              ctx.fillStyle = "#08685E";
-              ctx.fillRect(x * scale, y * scale, scale, scale);
-            }else {
-              ctx.fillStyle = "#FF0000";
-              ctx.fillRect(x * scale, y * scale, scale, scale);
-            }
+            ctx.fillStyle = "#FF0000";
+            ctx.fillRect(x * scale, y * scale, scale, scale);
         }
     }
 };
@@ -87,6 +82,15 @@ Environment.prototype.cleanupEnv = function(x, y) {
         delete this.env[x][y];
         if (!this.env[x].length) {
             delete this.env[x];
+        }
+    }
+};
+
+Environment.prototype.cleanupFoodLayer = function(x, y) {
+    if (!this.foodLayer[x][y].length) {
+        delete this.foodLayer[x][y];
+        if (!this.foodLayer[x].length) {
+            delete this.foodLayer[x];
         }
     }
 };

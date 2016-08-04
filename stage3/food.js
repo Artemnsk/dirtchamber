@@ -35,13 +35,13 @@ var Food = function(x, y, env, strategy) {
         this.env.food = [];
     }
     this.env.food.push(this);
-    if (!Array.isArray(this.env.env[this.x])) {
-        this.env.env[this.x] = [];
+    if (!Array.isArray(this.env.foodLayer[this.x])) {
+        this.env.foodLayer[this.x] = [];
     }
-    if (!Array.isArray(this.env.env[this.x][this.y])) {
-        this.env.env[this.x][this.y] = [];
+    if (!Array.isArray(this.env.foodLayer[this.x][this.y])) {
+        this.env.foodLayer[this.x][this.y] = [];
     }
-    this.env.env[this.x][this.y].push(this);
+    this.env.foodLayer[this.x][this.y].push(this);
 };
 
 /**
@@ -78,36 +78,47 @@ function reproduceAndUderYouself () {
         var food = new Food(x, y, this.env, {
             type: 'direct'
         });
-        this.env.env[x][y].push(food);
+        this.env.foodLayer[x][y].push(food);
         this.env.food.push(food);
     }
 };
 
 /**
- * Microbe dies and removed from the environment.
+ * Food dies and removed from the environment.
  */
 Food.prototype.die = function() {
     if (this.height <= 0) {
         var index = this.env.food.indexOf(this);
         this.env.food.splice(index, 1);
-        index = this.env.env[this.x][this.y].indexOf(this);
-        this.env.env[this.x][this.y].splice(index, 1);
+        index = this.env.foodLayer[this.x][this.y].indexOf(this);
+        this.env.foodLayer[this.x][this.y].splice(index, 1);
         // Clean up env array.
-        this.env.cleanupEnv(this.x, this.y);
+        this.env.cleanupFoodLayer(this.x, this.y);
     }
 };
 
 //======== strateges =========
 function reproduceAndPlaceNearRandomly() {
     if (Math.random() <= 0.0005) {
-      //@TODO Check for map boundaries
-        var x = this.x + randomNumberFromRange(-1, 2),
-            y = this.y +  randomNumberFromRange(-1, 2);
+        //@TODO Check for map boundaries
+        var possiblePlacements = [];
+        var variants = [-1, 0, 1];
+        for (var x in variants)
+            for (var y in variants)
+            if(x != 1 && y != 1)
+            // holy Indian cows!
+                if (typeof this.env.foodLayer[this.x + variants[x]][this.y + variants[y]] === 'undefined'
+                 && this.env.foodLayer[this.x + variants[x]][this.y + variants[y]].length <= 0)
+                    possiblePlacements.push({
+                        x: this.x + variants[x],
+                        y: this.y + variants[y]
+                    });
+        var choosenPlacementID = randomNumberFromRange(0, possiblePlacements.length - 1);
 
-        var food = new Food(x, y, this.env, {
+        var food = new Food(possiblePlacements[choosenPlacementID].x, possiblePlacements[choosenPlacementID].y, this.env, {
             type: 'direct'
         });
-        this.env.env[x][y].push(food);
+        this.env.foodLayer[choosenPlacement.x][choosenPlacement.y].push(food);
         this.env.food.push(food);
     }
 }

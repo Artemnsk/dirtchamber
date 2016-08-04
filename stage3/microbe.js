@@ -96,11 +96,15 @@ Microbe.prototype.move = function() {
 };
 
 Microbe.prototype.eat = function() {
-  for(index in this.env.env[this.x][this.y])
-    if (this.env.env[this.x][this.y][index] instanceof Food){
-      this.hitpoints +=2000;
-      this.env.env[this.x][this.y][index].height --;
-    }
+  if(Array.isArray(this.env.foodLayer))
+    if (Array.isArray(this.env.foodLayer[this.x]))
+      if (Array.isArray(this.env.foodLayer[this.x][this.y]))
+       for(var index in this.env.foodLayer[this.x][this.y]){
+        if (this.env.foodLayer[this.x][this.y][index] instanceof Food){
+          this.hitpoints +=2000;
+          this.env.foodLayer[this.x][this.y][index].height --;          
+        }
+      }
 };
 
 /**
