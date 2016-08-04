@@ -1,5 +1,5 @@
 const MICROBS_STARTING_POPULATION = 1000;
-const FOOD_STARTING_POPULATION = 100;
+const FOOD_STARTING_POPULATION = 2000;
 
 /**
  * Environment constructor.
@@ -12,7 +12,7 @@ var Environment = function (x, y) {
     this.minX = 0;
     this.minY = 0;
     if (typeof x == 'undefined') {
-        x = 500;
+        x = 400;
     }
     this.maxX = x;
     if (typeof y == 'undefined') {

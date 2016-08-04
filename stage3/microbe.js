@@ -85,6 +85,7 @@ Microbe.prototype.move = function() {
     }
 
     // Put the microbe into the environment cell.
+    // @TODO: create method in environment to put smthng to [x,y]
     if (!Array.isArray(this.env.env[this.x])) {
         this.env.env[this.x] = [];
     }

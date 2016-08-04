@@ -29,19 +29,19 @@ var Food = function(x, y, env, strategy) {
         default:
             this.x = randomNumberFromRange(this.env.minX, this.env.maxX);
             this.y = randomNumberFromRange(this.env.minY, this.env.maxY);
-            if (!Array.isArray(this.env.food)) {
-                this.env.food = [];
-            }
-            this.env.food.push(this);
-            if (!Array.isArray(this.env.env[this.x])) {
-                this.env.env[this.x] = [];
-            }
-            if (!Array.isArray(this.env.env[this.x][this.y])) {
-                this.env.env[this.x][this.y] = [];
-            }
-            this.env.env[this.x][this.y].push(this);
             break;
     }
+    if (!Array.isArray(this.env.food)) {
+        this.env.food = [];
+    }
+    this.env.food.push(this);
+    if (!Array.isArray(this.env.env[this.x])) {
+        this.env.env[this.x] = [];
+    }
+    if (!Array.isArray(this.env.env[this.x][this.y])) {
+        this.env.env[this.x][this.y] = [];
+    }
+    this.env.env[this.x][this.y].push(this);
 };
 
 /**
@@ -68,10 +68,13 @@ Food.prototype.eat = function() {
 /**
  * Food creates a new one near itself.
  */
-Food.prototype.reproduce = function() {
-    if (Math.random() <= 0.0005) {
+Food.prototype.reproduce = reproduceAndPlaceNearRandomly;
+
+function reproduceAndUderYouself () {
+    if (Math.random() <= 0.005) {
         var x = this.x,
             y = this.y;
+
         var food = new Food(x, y, this.env, {
             type: 'direct'
         });
@@ -93,3 +96,18 @@ Food.prototype.die = function() {
         this.env.cleanupEnv(this.x, this.y);
     }
 };
+
+//======== strateges =========
+function reproduceAndPlaceNearRandomly() {
+    if (Math.random() <= 0.0005) {
+      //@TODO Check for map boundaries
+        var x = this.x + randomNumberFromRange(-1, 2),
+            y = this.y +  randomNumberFromRange(-1, 2);
+
+        var food = new Food(x, y, this.env, {
+            type: 'direct'
+        });
+        this.env.env[x][y].push(food);
+        this.env.food.push(food);
+    }
+}
