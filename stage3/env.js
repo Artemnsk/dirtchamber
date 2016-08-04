@@ -1,5 +1,5 @@
-const MICROBS_STARTING_POPULATION = 10000;
-const FOOD_STARTING_POPULATION = 1000;
+const MICROBS_STARTING_POPULATION = 1000;
+const FOOD_STARTING_POPULATION = 100;
 
 /**
  * Environment constructor.
@@ -43,13 +43,24 @@ Environment.prototype.settle = function (strategy) {
 Environment.prototype.draw = function() {
     var c = document.getElementById("Area");
     var ctx = c.getContext("2d");
-    ctx.fillStyle = "#FF0000";
+
     var scale = 2;
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
     for (var x in this.env) {
         for (var y in this.env[x]) {
+          var food_here = false;
+          for(var z in this.env[x][y]){
+            if (this.env[x][y][z] instanceof Food)
+              food_here = true;
+        }
             // Since we delete any empty array in env we can safely assume that we've got at this x and y a microbe.
-            ctx.fillRect(x * scale, y * scale, scale, scale);
+            if(food_here){
+              ctx.fillStyle = "#08685E";
+              ctx.fillRect(x * scale, y * scale, scale, scale);
+            }else {
+              ctx.fillStyle = "#FF0000";
+              ctx.fillRect(x * scale, y * scale, scale, scale);
+            }
         }
     }
 };
@@ -60,6 +71,9 @@ Environment.prototype.draw = function() {
 Environment.prototype.step = function() {
     for (var index in this.microbes) {
         this.microbes[index].live();
+    }
+    for (var index in this.food) {
+        this.food[index].live();
     }
 };
 

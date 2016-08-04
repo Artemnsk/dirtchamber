@@ -11,11 +11,11 @@ const BIRTH_PROBABILITY = 0.005;
 var Microbe = function (x, y, env, strategy) {
     this.env = env;
     this.speed = 1;
-
+    this.hitpoints = 5000;
     if (typeof strategy == 'undefined') {
         strategy = {
             type: 'random',
-            data: {startingPopulation: STARTING_POPULATION}
+            data: {startingPopulation: MICROBS_STARTING_POPULATION}
         }
     }
 
@@ -95,7 +95,11 @@ Microbe.prototype.move = function() {
 };
 
 Microbe.prototype.eat = function() {
-
+  for(index in this.env.env[this.x][this.y])
+    if (this.env.env[this.x][this.y][index] instanceof Food){
+      this.hitpoints +=2000;
+      this.env.env[this.x][this.y][index].height --;
+    }
 };
 
 /**
@@ -113,12 +117,13 @@ Microbe.prototype.reproduce = function() {
  * Microbe dies and removed from the environment.
  */
 Microbe.prototype.die = function() {
-    if (Math.random() <= DEATH_PROBABILITY) {
-        var index = this.env.microbes.indexOf(this);
-        this.env.microbes.splice(index, 1);
-        index = this.env.env[this.x][this.y].indexOf(this);
-        this.env.env[this.x][this.y].splice(index, 1);
-        // Clean up env array.
-        this.env.cleanupEnv(this.x, this.y);
+    this.hitpoints -= 41;
+    if(this.hitpoints <= 0){
+      var index = this.env.microbes.indexOf(this);
+          this.env.microbes.splice(index, 1);
+          index = this.env.env[this.x][this.y].indexOf(this);
+          this.env.env[this.x][this.y].splice(index, 1);
+          // Clean up env array.
+          this.env.cleanupEnv(this.x, this.y);
     }
 };

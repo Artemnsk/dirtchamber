@@ -8,7 +8,7 @@ $(document).ready(function() {
             type: 'spline'
         },
         title: {
-            text: 'kolichestvo pizdyukov'
+            text: 'Count of microbes'
         },
         //xAxis: {
         //    categories: x..time
