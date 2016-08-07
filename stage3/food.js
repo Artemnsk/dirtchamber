@@ -1,5 +1,5 @@
 /**
- * Microbe constructor.
+ * Food constructor.
  * @param x
  * @param y
  * @param env
@@ -65,24 +65,7 @@ Food.prototype.eat = function() {
 
 };
 
-/**
- * Food creates a new one near itself.
- */
 Food.prototype.reproduce = reproduceAndPlaceNearRandomly;
-
-function reproduceAndUderYouself () {
-    if (Math.random() <= 0.005) {
-        var x = this.x,
-            y = this.y;
-
-        var food = new Food(x, y, this.env, {
-            type: 'direct'
-        });
-        this.env.foodLayer[x][y].push(food);
-        this.env.food.push(food);
-    }
-};
-
 /**
  * Food dies and removed from the environment.
  */
@@ -97,28 +80,48 @@ Food.prototype.die = function() {
     }
 };
 
-//======== strateges =========
+//======== Reproduction strateges =========
+/**
+ * Food creates a new one near itself.
+ */
 function reproduceAndPlaceNearRandomly() {
-    if (Math.random() <= 0.0005) {
-        //@TODO Check for map boundaries
+    if (Math.random() <= FOOD_REPRODUCTION_PROBABILITY) {
         var possiblePlacements = [];
-        var variants = [-1, 0, 1];
-        for (var x in variants)
-            for (var y in variants)
-            if(x != 1 && y != 1)
-            // holy Indian cows!
-                if (typeof this.env.foodLayer[this.x + variants[x]][this.y + variants[y]] === 'undefined'
-                 && this.env.foodLayer[this.x + variants[x]][this.y + variants[y]].length <= 0)
-                    possiblePlacements.push({
-                        x: this.x + variants[x],
-                        y: this.y + variants[y]
-                    });
-        var choosenPlacementID = randomNumberFromRange(0, possiblePlacements.length - 1);
+        var vars = [-1, 0, 1];
+        for (var x in vars)
+            for (var y in vars)
+                if ( !(x == 1 && y == 1))
+                //if ( x != 1 && y != 1) - try it - it's funny!
+                // checking if that cell is null (or undefined). Should we check if it is empty?
+                    if (this.env.foodLayer[this.x + vars[x]] == null ||
+                      this.env.foodLayer[this.x + vars[x]][this.y + vars[y]] == null)
+                      if( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.maxX) &&
+                        (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.maxY))
+                        possiblePlacements.push({
+                            x: this.x + vars[x],
+                            y: this.y + vars[y]
+                        });
+        if(possiblePlacements.length > 0){
+          var choosenPlacement = possiblePlacements[randomNumberFromRange(0, possiblePlacements.length - 1)];
 
-        var food = new Food(possiblePlacements[choosenPlacementID].x, possiblePlacements[choosenPlacementID].y, this.env, {
-            type: 'direct'
-        });
-        this.env.foodLayer[choosenPlacement.x][choosenPlacement.y].push(food);
-        this.env.food.push(food);
+          var food = new Food(choosenPlacement.x, choosenPlacement.y, this.env, {
+              type: 'direct'
+          });
+          this.env.foodLayer[choosenPlacement.x][choosenPlacement.y].push(food);
+          this.env.food.push(food);
+      }
     }
 }
+
+function reproduceUderYouself () {
+    if (Math.random() <= FOOD_REPRODUCTION_PROBABILITY) {
+        var x = this.x,
+            y = this.y;
+
+        var food = new Food(x, y, this.env, {
+            type: 'direct'
+        });
+        this.env.foodLayer[x][y].push(food);
+        this.env.food.push(food);
+    }
+};

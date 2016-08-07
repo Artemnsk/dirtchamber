@@ -1,6 +1,3 @@
-const DEATH_PROBABILITY = 0.005;
-const BIRTH_PROBABILITY = 0.005;
-
 /**
  * Microbe constructor.
  * @param x
@@ -102,7 +99,7 @@ Microbe.prototype.eat = function() {
        for(var index in this.env.foodLayer[this.x][this.y]){
         if (this.env.foodLayer[this.x][this.y][index] instanceof Food){
           this.hitpoints +=2000;
-          this.env.foodLayer[this.x][this.y][index].height --;          
+          this.env.foodLayer[this.x][this.y][index].height --;
         }
       }
 };
