@@ -5,10 +5,13 @@
  * @param env
  * @constructor
  */
-var Microbe = function (x, y, env, strategy) {
+var Microbe = function (x, y, env, strategy, hitpoints) {
+    if (!hitpoints) {
+        hitpoints = MICROBE_STARTING_HITPOINTS;
+    }
     this.env = env;
     this.speed = 1;
-    this.hitpoints = 5000;
+    this.hitpoints = hitpoints;
     if (typeof strategy == 'undefined') {
         strategy = {
             type: 'random',
@@ -98,7 +101,7 @@ Microbe.prototype.eat = function() {
       if (Array.isArray(this.env.foodLayer[this.x][this.y]))
        for(var index in this.env.foodLayer[this.x][this.y]){
         if (this.env.foodLayer[this.x][this.y][index] instanceof Food){
-          this.hitpoints +=2000;
+          this.hitpoints += Math.round(MICROBE_STARTING_HITPOINTS / 2.5);
           this.env.foodLayer[this.x][this.y][index].height --;
         }
       }
@@ -108,8 +111,13 @@ Microbe.prototype.eat = function() {
  * Microbe creates a new one at the same position as itself.
  */
 Microbe.prototype.reproduce = function() {
-    if (Math.random() <= BIRTH_PROBABILITY) {
-        var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'});
+    var birthProbability = BIRTH_PROBABILITY;
+    var modifier = Math.round(this.hitpoints / MICROBE_STARTING_HITPOINTS);
+    var modifier = Math.min(modifier, 1);
+    birthProbability *= modifier;
+    if (Math.random() <= birthProbability) {
+        this.hitpoints = Math.round(this.hitpoints / 2);
+        var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints);
         this.env.env[this.x][this.y].push(microbe);
         this.env.microbes.push(microbe);
     }
