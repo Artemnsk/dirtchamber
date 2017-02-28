@@ -4,10 +4,15 @@
  * @param y
  * @constructor
  */
-var Player = function () {
-    this.nickname = 0;
-    this.color = 0;
-    this.algorithm = function () {
-
+var Player = function (nickname, color, algorithm) {
+    this.nickname = nickname;
+    this.color = color;
+    // TODO:
+    this.algorithm = function (microbe) {
+        // TODO:
+        microbe.move();
+        microbe.eat();
+        microbe.reproduce();
+        microbe.die();
     };
 };

@@ -35,8 +35,12 @@ var Environment = function (x, y) {
  * @param strategy
  */
 Environment.prototype.settle = function (strategy) {
+    // Create players.
+    var player1 = new Player('player 1', 'red', function (microbe) {});
+    var player2 = new Player('player 2', 'blue', function (microbe) {});
     for (var i = 0; i < MICROBS_STARTING_POPULATION; i++) {
-        new Microbe(null, null, this, {type: 'random'});
+        var current_player = (i % 2 == 0) ? player1 : player2;
+        new Microbe(null, null, this, {type: 'random'}, null, current_player);
     }
     for (var i = 0; i < FOOD_STARTING_POPULATION; i++) {
         new Food(null, null, this, {type: 'random'});

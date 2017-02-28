@@ -48,10 +48,10 @@ var Microbe = function (x, y, env, strategy, hitpoints, player) {
  * Main microbe method which calculates a step of microbe's life.
  */
 Microbe.prototype.live = function() {
-    this.move();
-    this.eat();
-    this.reproduce();
-    this.die();
+    if (this.player && this.player instanceof Player) {
+        // TODO: maybe send move(), eat() and other as complete functions to avoid cheats?
+        this.player.algorithm.call(null, this);
+    }
 };
 
 /**
@@ -118,7 +118,7 @@ Microbe.prototype.reproduce = function() {
     birthProbability *= modifier;
     if (Math.random() <= birthProbability) {
         this.hitpoints = Math.round(this.hitpoints / 2);
-        var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints);
+        var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints, this.player);
         this.env.env[this.x][this.y].push(microbe);
         this.env.microbes.push(microbe);
     }
