@@ -5,10 +5,11 @@
  * @param env
  * @constructor
  */
-var Microbe = function (x, y, env, strategy, hitpoints) {
+var Microbe = function (x, y, env, strategy, hitpoints, player) {
     if (!hitpoints) {
         hitpoints = MICROBE_STARTING_HITPOINTS;
     }
+    this.player = player;
     this.env = env;
     this.speed = 1;
     this.hitpoints = hitpoints;
