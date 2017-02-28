@@ -26,8 +26,12 @@ var Environment = function (x, y) {
     this.maxY = y;
 
     // Initialize environment array.
+    // TODO: where is env.microbes array?? It seems it being used somewhere to store all active microbes but there is no such array in this constructor.
     this.env = [];
     this.foodLayer = [];
+
+    this.messages = [];
+    this.messageLayer = [];
 };
 
 /**
@@ -38,6 +42,7 @@ Environment.prototype.settle = function (strategy) {
     // Create players.
     var player1 = new Player('player 1', 'red', function (microbe) {});
     var player2 = new Player('player 2', 'blue', function (microbe) {});
+    // Create microbes for these players.
     for (var i = 0; i < MICROBS_STARTING_POPULATION; i++) {
         var current_player = (i % 2 == 0) ? player1 : player2;
         new Microbe(null, null, this, {type: 'random'}, null, current_player);
@@ -58,6 +63,7 @@ Environment.prototype.draw = function() {
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
     for (var x in this.foodLayer)
         for (var y in this.foodLayer[x]) {
+            // TODO: maybe all layer elements should implement interface 'drawable'?
             ctx.fillStyle = "#08685E";
             ctx.fillRect(x * scale, y * scale, scale, scale);
         }
@@ -73,12 +79,16 @@ Environment.prototype.draw = function() {
  * Process a step in environment.
  */
 Environment.prototype.step = function() {
+    // TODO: seems like here we should make full environment snapshot and provide microbes with it to force them make decisions
+    // TODO: basing on old position. Such way they always act "simultaneously".
     for (var index in this.microbes) {
         this.microbes[index].live();
     }
     for (var index in this.food) {
         this.food[index].live();
     }
+    // TODO: Then we should "process" environment: like 'did somebody being eat?' and so on.
+    // TODO: when we clear messageLayer that's simply enough to delete each message obj in env.messages array. Check it.
 };
 
 /**

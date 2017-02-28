@@ -138,3 +138,14 @@ Microbe.prototype.die = function() {
           this.env.cleanupEnv(this.x, this.y);
     }
 };
+
+/**
+ * Microbe yells some message.
+ */
+Microbe.prototype.yell = function(text) {
+    // Create message.
+    var message = new Message(text, this.x, this.y, this.env, this.player);
+    // TODO: put this message by reference into appropriate cells in env.messageLayer.
+    this.env.messages.push(message);
+    this.env.messageLayer[this.x][this.y].push(message);
+};
