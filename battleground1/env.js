@@ -2,6 +2,7 @@ const MICROBS_STARTING_POPULATION = 2000;
 const DEATH_PROBABILITY = 0.005;
 const BIRTH_PROBABILITY = 0.005;
 const MICROBE_STARTING_HITPOINTS = 2000;
+const MESSAGE_RADIUS = 2;
 
 const FOOD_STARTING_POPULATION = 200;
 const FOOD_REPRODUCTION_PROBABILITY = 0.005
@@ -31,7 +32,13 @@ var Environment = function (x, y) {
     this.foodLayer = [];
 
     this.messages = [];
-    this.messageLayer = [];
+    this.messageLayer = {};
+    for (i = this.minX; i <= this.maxX; i++) {
+        this.messageLayer[i] = {};
+        for (j = this.minY; j <= this.maxY; j++) {
+            this.messageLayer[i][j] = [];
+        }
+    }
 };
 
 /**
@@ -112,4 +119,29 @@ Environment.prototype.cleanupFoodLayer = function(x, y) {
             delete this.foodLayer[x];
         }
     }
+};
+
+/**
+ * Returns messages array which available in (x, y) position.
+ * @param x
+ * @param y
+ */
+Environment.prototype.getMessages = function (x, y) {
+    var response = [];
+    for (var i = x - MESSAGE_RADIUS; i <= x + MESSAGE_RADIUS; i++) {
+        if ((this.minX <= i) && (i <= this.maxX)) {
+            for (var j = y - MESSAGE_RADIUS; j <= y + MESSAGE_RADIUS; j++) {
+                if ((this.minY <= j) && (j <= this.maxY)) {
+                    var messages = this.messageLayer[i][j];
+                    for (var index = 0; index < messages.length; index++) {
+                        var a = response.indexOf(messages[index]);
+                        if (response.indexOf(messages[index]) === -1) {
+                            response.push(messages[index]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return response;
 };

@@ -49,15 +49,53 @@ var Microbe = function (x, y, env, strategy, hitpoints, player) {
  */
 Microbe.prototype.live = function() {
     if (this.player && this.player instanceof Player) {
-        // TODO: maybe send move(), eat() and other as complete functions to avoid cheats?
-        this.player.algorithm.call(null, this);
+        var that = this;
+        // Secure operation to not allow player use the entire microbe object in algorithm.
+        var microbe_move = function (move_x, move_y) {
+            that.move(move_x, move_y);
+        };
+        var microbe_eat = function () {
+            that.eat();
+        };
+        var microbe_reproduce = function () {
+            that.reproduce();
+        };
+        var microbe_die = function () {
+            that.die();
+        };
+        var microbe_yell = function (text) {
+            that.yell(text);
+        };
+        // Get messages.
+        var messages = this.env.getMessages(this.x, this.y);
+        // TODO: Get environment.
+        this.player.algorithm.call(null, messages, microbe_move, microbe_eat, microbe_reproduce, microbe_die, microbe_yell);
     }
 };
 
 /**
  * Move microbe in environment.
  */
-Microbe.prototype.move = function() {
+Microbe.prototype.move = function(move_x, move_y) {
+    // FIXME: use isNumeric() of jQuery. Hope that's OK?
+    // Convert non-number values into zero.
+    if (!$.isNumeric(move_x)) {
+        move_x = 0;
+    }
+    if (!$.isNumeric(move_y)) {
+        move_y = 0;
+    }
+    // Round values if non-integers being provided.
+    move_x = Math.round(move_x);
+    move_y = Math.round(move_y);
+    // Check if are going to move.
+    if (move_x == 0 && move_y == 0) {
+        return;
+    }
+    // Do not allow to move if step > 1.
+    if (Math.abs(move_x) > 1 || Math.abs(move_y) > 1) {
+        return;
+    }
     // Pop the microbe from its environment cell.
     var index = this.env.env[this.x][this.y].indexOf(this);
     this.env.env[this.x][this.y].splice(index, 1);
@@ -65,12 +103,8 @@ Microbe.prototype.move = function() {
     this.env.cleanupEnv(this.x, this.y);
 
     // Move microbe.
-    var direction = {
-        x : randomNumberFromRange(-1, 2), // -1, 0 or 1.
-        y : randomNumberFromRange(-1, 2) // -1, 0 or 1.
-    };
-    this.x += this.speed * direction.x;
-    this.y += this.speed * direction.y;
+    this.x += this.speed * move_x;
+    this.y += this.speed * move_y;
     // Check for out of bounds scenario.
     if (this.x < this.env.minX) {
         this.x = this.env.minX;

@@ -8,11 +8,14 @@ var Player = function (nickname, color, algorithm) {
     this.nickname = nickname;
     this.color = color;
     // TODO:
-    this.algorithm = function (microbe) {
+    this.algorithm = function (messages, microbe_move, microbe_eat, microbe_reproduce, microbe_die, microbe_yell) {
         // TODO:
-        microbe.move();
-        microbe.eat();
-        microbe.reproduce();
-        microbe.die();
+        var move_x = randomNumberFromRange(-1, 2);
+        var move_y = randomNumberFromRange(-1, 2);
+        microbe_move(move_x, move_y);
+        microbe_eat();
+        microbe_reproduce();
+        microbe_die();
+        microbe_yell('asd');
     };
 };
