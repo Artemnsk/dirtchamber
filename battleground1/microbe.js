@@ -77,9 +77,12 @@ Microbe.prototype.move = function(move_x, move_y) {
     if (move_x == 0 && move_y == 0) {
         return;
     }
-    // Do not allow to move if step > 1.
-    if (Math.abs(move_x) > 1 || Math.abs(move_y) > 1) {
-        return;
+    // Normalisation.
+    if (Math.abs(move_x) > 1) {
+        move_x = Math.sign(move_x);
+    }
+    if (Math.abs(move_y) > 1) {
+        move_y = Math.sign(move_y);
     }
     // Pop the microbe from its environment cell.
     var index = this.env.env[this.x][this.y].microbes.indexOf(this);
@@ -141,6 +144,7 @@ Microbe.prototype.giveEnvironmentInfo = function() {
         'x': this.x,
         'y': this.y,
         'player': this.player.nickname,
+        'type': 'microbe',
         'hitpoints': this.hitpoints
     };
     return JSON.stringify(text);

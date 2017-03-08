@@ -49,6 +49,7 @@ Food.prototype.giveEnvironmentInfo = function() {
     var text = {
         'x': this.x,
         'y': this.y,
+        'type': 'food',
         'height': this.height
     };
     return JSON.stringify(text);
