@@ -60,7 +60,7 @@ Microbe.prototype.live = function() {
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
         // TODO: Get environment.
-        this.player.algorithm.call(null, messages, microbe_move, microbe_eat, microbe_reproduce, microbe_die, microbe_yell);
+        this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_eat, microbe_reproduce, microbe_die, microbe_yell);
     }
 };
 

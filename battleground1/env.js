@@ -28,7 +28,6 @@ var Environment = function (x, y) {
     this.maxY = y;
 
     // Initialize environment array.
-    // TODO: where is env.microbes array?? It seems it being used somewhere to store all active microbes but there is no such array in this constructor.
     this.microbes = [];
     this.messages = [];
     this.food = [];
@@ -99,7 +98,7 @@ Environment.prototype.draw = function() {
  */
 Environment.prototype.step = function() {
     // Generate env messages. Each object on env layer should "introduce" itself.
-    //this.prepareEnvironmentInfo();
+    this.prepareEnvironmentInfo();
     // .. and only now increase step.
     this.current_step++;
     for (var index in this.microbes) {
@@ -109,7 +108,12 @@ Environment.prototype.step = function() {
         this.food[index].live();
     }
     // "Process" environment.
-
+    for (i in this.env) {
+        for (j in this.env[i]) {
+            // Microbe battle.
+            this.processLayerItem(this.env[i][j]);
+        }
+    }
     // Remove old messages.
     var i = 0;
     while (i < this.messages.length) {
@@ -122,6 +126,53 @@ Environment.prototype.step = function() {
             i++;
         }
     }
+};
+
+/**
+ * Process layer item.
+ */
+Environment.prototype.processLayerItem = function(item) {
+    // Microbe 'battle'.
+    if (item.microbes.length > 1) {
+        // 1. Collect different players.
+        var players = [];
+        for (var i = 0; i < item.microbes.length; i++) {
+            var index = players.indexOf(item.microbes[i].player);
+            if (index === -1) {
+                players.push(item.microbes[i].player);
+            }
+        }
+        // 2. Proceed with battle.
+        if (players.length > 1) {
+            // Player with maximum microbes hitpoints will win the battle.
+            var hitpoints_by_player = [];
+            // Set all to 0.
+            for (var i = 0; i < players.length; i++) {
+                hitpoints_by_player[i] = 0;
+            }
+            for (var i = 0; i < item.microbes.length; i++) {
+                var index = players.indexOf(item.microbes[i].player);
+                hitpoints_by_player[index] += item.microbes[i].hitpoints;
+            }
+            // Get index of max element in hitpoints_by_player;
+            var max_hitpoints_index = 0;
+            for (var i = 1; i < hitpoints_by_player.length; i++) {
+                if (hitpoints_by_player[i] > hitpoints_by_player[max_hitpoints_index]) {
+                    max_hitpoints_index = i;
+                }
+            }
+            var winner = players[max_hitpoints_index];
+            // Even if value is the same the winner will be pseudo-random - you never know which microbe goes first in the layer.
+            for (var i = 0; i < item.microbes.length; i++) {
+                if (item.microbes[i].player != winner) {
+                    // Dying will be calculated further.
+                    item.microbes[i].hitpoints = 0;
+                }
+            }
+        }
+    }
+    // TODO: get rid of 'eat' and calculate eating here.
+    // TODO: get rid of 'die' and calculate dying here.
 };
 
 /**
