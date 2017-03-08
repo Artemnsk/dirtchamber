@@ -111,6 +111,7 @@ Environment.prototype.step = function() {
     for (i in this.env) {
         for (j in this.env[i]) {
             // Microbe battle.
+            var a = j;
             this.processLayerItem(this.env[i][j]);
         }
     }
@@ -172,7 +173,21 @@ Environment.prototype.processLayerItem = function(item) {
         }
     }
     // TODO: get rid of 'eat' and calculate eating here.
-    // TODO: get rid of 'die' and calculate dying here.
+    // Kill microbes with no hitpoints.
+    var i = 0;
+    while (i < item.microbes.length) {
+        // Decrease hitpoints at first.
+        item.microbes[i].hitpoints -= 41;
+        if (item.microbes[i].hitpoints <= 0){
+            // TODO: check that 'item' refers to real same in 'env'.
+            item.microbes.splice(i, 1);
+            index = this.microbes.indexOf(item.microbes[i]);
+            this.microbes.splice(index, 1);
+        } else {
+            // We can proceed to the next element in array.
+            i++;
+        }
+    }
 };
 
 /**

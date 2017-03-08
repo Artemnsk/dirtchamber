@@ -51,16 +51,13 @@ Microbe.prototype.live = function() {
         var microbe_reproduce = function () {
             that.reproduce();
         };
-        var microbe_die = function () {
-            that.die();
-        };
         var microbe_yell = function (text) {
             that.yell(text);
         };
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
         // TODO: Get environment.
-        this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_eat, microbe_reproduce, microbe_die, microbe_yell);
+        this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_eat, microbe_reproduce, microbe_yell);
     }
 };
 
@@ -132,19 +129,6 @@ Microbe.prototype.reproduce = function() {
         var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints, this.player);
         this.env.env[this.x][this.y].microbes.push(microbe);
         this.env.microbes.push(microbe);
-    }
-};
-
-/**
- * Microbe dies and removed from the environment.
- */
-Microbe.prototype.die = function() {
-    this.hitpoints -= 41;
-    if(this.hitpoints <= 0){
-        var index = this.env.microbes.indexOf(this);
-        this.env.microbes.splice(index, 1);
-        index = this.env.env[this.x][this.y].microbes.indexOf(this);
-        this.env.env[this.x][this.y].microbes.splice(index, 1);
     }
 };
 
