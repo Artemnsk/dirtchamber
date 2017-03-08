@@ -31,17 +31,7 @@ var Food = function(x, y, env, strategy) {
             this.y = randomNumberFromRange(this.env.minY, this.env.maxY);
             break;
     }
-    if (!Array.isArray(this.env.food)) {
-        this.env.food = [];
-    }
-    this.env.food.push(this);
-    if (!Array.isArray(this.env.foodLayer[this.x])) {
-        this.env.foodLayer[this.x] = [];
-    }
-    if (!Array.isArray(this.env.foodLayer[this.x][this.y])) {
-        this.env.foodLayer[this.x][this.y] = [];
-    }
-    this.env.foodLayer[this.x][this.y].push(this);
+    this.env.env[this.x][this.y].food.push(this);
 };
 
 /**
@@ -73,10 +63,8 @@ Food.prototype.die = function() {
     if (this.height <= 0) {
         var index = this.env.food.indexOf(this);
         this.env.food.splice(index, 1);
-        index = this.env.foodLayer[this.x][this.y].indexOf(this);
-        this.env.foodLayer[this.x][this.y].splice(index, 1);
-        // Clean up env array.
-        this.env.cleanupFoodLayer(this.x, this.y);
+        index = this.env.env[this.x][this.y].food.indexOf(this);
+        this.env.env[this.x][this.y].food.splice(index, 1);
     }
 };
 
@@ -93,9 +81,8 @@ function reproduceAndPlaceNearRandomly() {
                 if ( !(x == 1 && y == 1))
                 //if ( x != 1 && y != 1) - try it - it's funny!
                 // checking if that cell is null (or undefined). Should we check if it is empty?
-                    if (this.env.foodLayer[this.x + vars[x]] == null ||
-                      this.env.foodLayer[this.x + vars[x]][this.y + vars[y]] == null)
-                      if( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.maxX) &&
+                    if (empty(this.env.env[this.x][this.y].microbes) && empty(this.env.env[this.x][this.y].food))
+                      if ( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.maxX) &&
                         (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.maxY))
                         possiblePlacements.push({
                             x: this.x + vars[x],
@@ -107,7 +94,7 @@ function reproduceAndPlaceNearRandomly() {
           var food = new Food(choosenPlacement.x, choosenPlacement.y, this.env, {
               type: 'direct'
           });
-          this.env.foodLayer[choosenPlacement.x][choosenPlacement.y].push(food);
+          this.env.env[choosenPlacement.x][choosenPlacement.y].food.push(food);
           this.env.food.push(food);
       }
     }
@@ -121,7 +108,7 @@ function reproduceUderYouself () {
         var food = new Food(x, y, this.env, {
             type: 'direct'
         });
-        this.env.foodLayer[x][y].push(food);
+        this.env.env[x][y].food.push(food);
         this.env.food.push(food);
     }
 };

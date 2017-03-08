@@ -11,4 +11,6 @@ var Message = function (text, x, y, env, player) {
     this.y = y;
     // Message could belong to some player.
     this.player = player;
+    this.step = env.current_step;
+    this.text = text;
 };

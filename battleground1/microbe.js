@@ -29,17 +29,8 @@ var Microbe = function (x, y, env, strategy, hitpoints, player) {
         default:
             this.x = randomNumberFromRange(this.env.minX, this.env.maxX);
             this.y = randomNumberFromRange(this.env.minY, this.env.maxY);
-            if (!Array.isArray(this.env.microbes)) {
-                this.env.microbes = [];
-            }
             this.env.microbes.push(this);
-            if (!Array.isArray(this.env.env[this.x])) {
-                this.env.env[this.x] = [];
-            }
-            if (!Array.isArray(this.env.env[this.x][this.y])) {
-                this.env.env[this.x][this.y] = [];
-            }
-            this.env.env[this.x][this.y].push(this);
+            this.env.env[this.x][this.y].microbes.push(this);
             break;
     }
 };
@@ -97,10 +88,8 @@ Microbe.prototype.move = function(move_x, move_y) {
         return;
     }
     // Pop the microbe from its environment cell.
-    var index = this.env.env[this.x][this.y].indexOf(this);
-    this.env.env[this.x][this.y].splice(index, 1);
-    // Clean up env array.
-    this.env.cleanupEnv(this.x, this.y);
+    var index = this.env.env[this.x][this.y].microbes.indexOf(this);
+    this.env.env[this.x][this.y].microbes.splice(index, 1);
 
     // Move microbe.
     this.x += this.speed * move_x;
@@ -120,26 +109,14 @@ Microbe.prototype.move = function(move_x, move_y) {
     }
 
     // Put the microbe into the environment cell.
-    // @TODO: create method in environment to put smthng to [x,y]
-    if (!Array.isArray(this.env.env[this.x])) {
-        this.env.env[this.x] = [];
-    }
-    if (!Array.isArray(this.env.env[this.x][this.y])) {
-        this.env.env[this.x][this.y] = [];
-    }
-    this.env.env[this.x][this.y].push(this);
+    this.env.env[this.x][this.y].microbes.push(this);
 };
 
 Microbe.prototype.eat = function() {
-  if(Array.isArray(this.env.foodLayer))
-    if (Array.isArray(this.env.foodLayer[this.x]))
-      if (Array.isArray(this.env.foodLayer[this.x][this.y]))
-       for(var index in this.env.foodLayer[this.x][this.y]){
-        if (this.env.foodLayer[this.x][this.y][index] instanceof Food){
-          this.hitpoints += Math.round(MICROBE_STARTING_HITPOINTS / 2.5);
-          this.env.foodLayer[this.x][this.y][index].height --;
-        }
-      }
+   for (var index in this.env.env[this.x][this.y].food) {
+       this.hitpoints += Math.round(MICROBE_STARTING_HITPOINTS / 2.5);
+       this.env.env[this.x][this.y].food[index].height--;
+   }
 };
 
 /**
@@ -153,7 +130,7 @@ Microbe.prototype.reproduce = function() {
     if (Math.random() <= birthProbability) {
         this.hitpoints = Math.round(this.hitpoints / 2);
         var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints, this.player);
-        this.env.env[this.x][this.y].push(microbe);
+        this.env.env[this.x][this.y].microbes.push(microbe);
         this.env.microbes.push(microbe);
     }
 };
@@ -164,12 +141,10 @@ Microbe.prototype.reproduce = function() {
 Microbe.prototype.die = function() {
     this.hitpoints -= 41;
     if(this.hitpoints <= 0){
-      var index = this.env.microbes.indexOf(this);
-          this.env.microbes.splice(index, 1);
-          index = this.env.env[this.x][this.y].indexOf(this);
-          this.env.env[this.x][this.y].splice(index, 1);
-          // Clean up env array.
-          this.env.cleanupEnv(this.x, this.y);
+        var index = this.env.microbes.indexOf(this);
+        this.env.microbes.splice(index, 1);
+        index = this.env.env[this.x][this.y].microbes.indexOf(this);
+        this.env.env[this.x][this.y].microbes.splice(index, 1);
     }
 };
 
@@ -181,5 +156,18 @@ Microbe.prototype.yell = function(text) {
     var message = new Message(text, this.x, this.y, this.env, this.player);
     // TODO: put this message by reference into appropriate cells in env.messageLayer.
     this.env.messages.push(message);
-    this.env.messageLayer[this.x][this.y].push(message);
+    this.env.env[this.x][this.y].messages.push(message);
+};
+
+/**
+ * Provide environment with info about this object.
+ */
+Microbe.prototype.giveEnvironmentInfo = function() {
+    var text = {
+        'x': this.x,
+        'y': this.y,
+        'player': this.player.nickname,
+        'hitpoints': this.hitpoints
+    };
+    return JSON.stringify(text);
 };

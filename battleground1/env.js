@@ -1,4 +1,4 @@
-const MICROBS_STARTING_POPULATION = 2000;
+const MICROBS_STARTING_POPULATION = 1000;
 const DEATH_PROBABILITY = 0.005;
 const BIRTH_PROBABILITY = 0.005;
 const MICROBE_STARTING_HITPOINTS = 2000;
@@ -14,29 +14,33 @@ const FOOD_REPRODUCTION_PROBABILITY = 0.005
  * @constructor
  */
 var Environment = function (x, y) {
+    this.current_step = 0;
     // Initialize world boundaries.
     this.minX = 0;
     this.minY = 0;
     if (typeof x == 'undefined') {
-        x = 400;
+        x = 200;
     }
     this.maxX = x;
     if (typeof y == 'undefined') {
-        y = 400;
+        y = 200;
     }
     this.maxY = y;
 
     // Initialize environment array.
     // TODO: where is env.microbes array?? It seems it being used somewhere to store all active microbes but there is no such array in this constructor.
-    this.env = [];
-    this.foodLayer = [];
-
+    this.microbes = [];
     this.messages = [];
-    this.messageLayer = {};
+    this.food = [];
+    this.env = {};
     for (i = this.minX; i <= this.maxX; i++) {
-        this.messageLayer[i] = {};
+        this.env[i] = {};
         for (j = this.minY; j <= this.maxY; j++) {
-            this.messageLayer[i][j] = [];
+            this.env[i][j] = {
+                'microbes': [],
+                'messages': [],
+                'food': [],
+            };
         }
     }
 };
@@ -76,8 +80,16 @@ Environment.prototype.draw = function() {
         }
     for (var x in this.env) {
         for (var y in this.env[x]) {
-            ctx.fillStyle = "#FF0000";
-            ctx.fillRect(x * scale, y * scale, scale, scale);
+            for (var k = 0; k < this.env[x][y].microbes.length; k++) {
+                ctx.fillStyle = this.env[x][y].microbes[k].player.color;
+                ctx.fillRect(x * scale, y * scale, scale, scale);
+                break;
+            }
+            for (var k = 0; k < this.env[x][y].food.length; k++) {
+                ctx.fillStyle = 'green';
+                ctx.fillRect(x * scale, y * scale, scale, scale);
+                break;
+            }
         }
     }
 };
@@ -86,37 +98,28 @@ Environment.prototype.draw = function() {
  * Process a step in environment.
  */
 Environment.prototype.step = function() {
-    // TODO: seems like here we should make full environment snapshot and provide microbes with it to force them make decisions
-    // TODO: basing on old position. Such way they always act "simultaneously".
+    // Generate env messages. Each object on env layer should "introduce" itself.
+    //this.prepareEnvironmentInfo();
+    // .. and only now increase step.
+    this.current_step++;
     for (var index in this.microbes) {
         this.microbes[index].live();
     }
     for (var index in this.food) {
         this.food[index].live();
     }
-    // TODO: Then we should "process" environment: like 'did somebody being eat?' and so on.
-    // TODO: when we clear messageLayer that's simply enough to delete each message obj in env.messages array. Check it.
-};
+    // "Process" environment.
 
-/**
- * Clean up env array at position (x,y).
- * @param x
- * @param y
- */
-Environment.prototype.cleanupEnv = function(x, y) {
-    if (!this.env[x][y].length) {
-        delete this.env[x][y];
-        if (!this.env[x].length) {
-            delete this.env[x];
-        }
-    }
-};
-
-Environment.prototype.cleanupFoodLayer = function(x, y) {
-    if (!this.foodLayer[x][y].length) {
-        delete this.foodLayer[x][y];
-        if (!this.foodLayer[x].length) {
-            delete this.foodLayer[x];
+    // Remove old messages.
+    var i = 0;
+    while (i < this.messages.length) {
+        if (this.messages[i].step < this.current_step) {
+            var index = this.env[this.messages[i].x][this.messages[i].y].messages.indexOf(this.messages[i]);
+            this.env[this.messages[i].x][this.messages[i].y].messages.splice(index, 1);
+            this.messages.splice(i, 1);
+        } else {
+            // Nothing was deleted, we can proceed to next array element.
+            i++;
         }
     }
 };
@@ -132,11 +135,12 @@ Environment.prototype.getMessages = function (x, y) {
         if ((this.minX <= i) && (i <= this.maxX)) {
             for (var j = y - MESSAGE_RADIUS; j <= y + MESSAGE_RADIUS; j++) {
                 if ((this.minY <= j) && (j <= this.maxY)) {
-                    var messages = this.messageLayer[i][j];
-                    for (var index = 0; index < messages.length; index++) {
-                        var a = response.indexOf(messages[index]);
-                        if (response.indexOf(messages[index]) === -1) {
-                            response.push(messages[index]);
+                    for (var index = 0; index < this.env[i][j].messages.length; index++) {
+                        // If message was not created on current step.
+                        if (this.env[i][j].messages[index].step < this.current_step) {
+                            if (response.indexOf(this.env[i][j].messages[index]) === -1) {
+                                response.push(this.env[i][j].messages[index]);
+                            }
                         }
                     }
                 }
@@ -144,4 +148,20 @@ Environment.prototype.getMessages = function (x, y) {
         }
     }
     return response;
+};
+
+/**
+ * Asks for each object in environment and puts it's info message into appropriate place.
+ */
+Environment.prototype.prepareEnvironmentInfo = function () {
+    for (var i = this.minX; i <= this.maxX; i++) {
+        for (var j = this.minY; j <= this.maxY; j++) {
+            for (var k = 0; k < this.env[i][j].microbes.length; k++) {
+                // TODO: check if giveEnvironmentInfo exists.
+                var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);
+                this.messages.push(message);
+                this.env[i][j].messages.push(message);
+            }
+        }
+    }
 };
