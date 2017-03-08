@@ -5,7 +5,7 @@ const MICROBE_STARTING_HITPOINTS = 2000;
 const MESSAGE_RADIUS = 2;
 
 const FOOD_STARTING_POPULATION = 200;
-const FOOD_REPRODUCTION_PROBABILITY = 0.005
+const FOOD_REPRODUCTION_PROBABILITY = 0.005;
 
 /**
  * Environment constructor.
@@ -38,7 +38,7 @@ var Environment = function (x, y) {
             this.env[i][j] = {
                 'microbes': [],
                 'messages': [],
-                'food': [],
+                'food': []
             };
         }
     }
@@ -71,23 +71,15 @@ Environment.prototype.draw = function() {
 
     var scale = 2;
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
-    for (var x in this.foodLayer)
-        for (var y in this.foodLayer[x]) {
-            // TODO: maybe all layer elements should implement interface 'drawable'?
-            ctx.fillStyle = "#08685E";
-            ctx.fillRect(x * scale, y * scale, scale, scale);
-        }
     for (var x in this.env) {
         for (var y in this.env[x]) {
-            for (var k = 0; k < this.env[x][y].microbes.length; k++) {
-                ctx.fillStyle = this.env[x][y].microbes[k].player.color;
+            if (this.env[x][y].microbes.length > 0) {
+                ctx.fillStyle = this.env[x][y].microbes[0].player.color;
                 ctx.fillRect(x * scale, y * scale, scale, scale);
-                break;
             }
-            for (var k = 0; k < this.env[x][y].food.length; k++) {
+            if (this.env[x][y].food.length > 0) {
                 ctx.fillStyle = 'green';
                 ctx.fillRect(x * scale, y * scale, scale, scale);
-                break;
             }
         }
     }
@@ -110,8 +102,7 @@ Environment.prototype.step = function() {
     // "Process" environment.
     for (i in this.env) {
         for (j in this.env[i]) {
-            // Microbe battle.
-            var a = j;
+            // Process layer item.
             this.processLayerItem(this.env[i][j]);
         }
     }
@@ -172,19 +163,46 @@ Environment.prototype.processLayerItem = function(item) {
             }
         }
     }
-    // TODO: get rid of 'eat' and calculate eating here.
     // Kill microbes with no hitpoints.
     var i = 0;
     while (i < item.microbes.length) {
         // Decrease hitpoints at first.
         item.microbes[i].hitpoints -= 41;
-        if (item.microbes[i].hitpoints <= 0){
-            // TODO: check that 'item' refers to real same in 'env'.
-            item.microbes.splice(i, 1);
+        if (item.microbes[i].hitpoints <= 0) {
             index = this.microbes.indexOf(item.microbes[i]);
             this.microbes.splice(index, 1);
+            item.microbes.splice(i, 1);
         } else {
             // We can proceed to the next element in array.
+            i++;
+        }
+    }
+    // Eat. That's better to do it after battle and dying to not resurrect dead microbe.
+    // That's easy. Each microbe which stays on food can eat it.
+    if (item.food.length > 0 && item.microbes.length > 0) {
+        // Each microbe eats the first avaikabke food.
+        for (var i = 0; i < item.microbes.length; i++) {
+            for (var j = 0; j < item.food.length; j++) {
+                if (item.food[j].height <= 0) {
+                    // Do not feed from empty food.
+                    continue;
+                } else {
+                    // Feed. We will delete eaten food later.
+                    item.food[j].height--;
+                    item.microbes[i].hitpoints += Math.round(MICROBE_STARTING_HITPOINTS / 2.5);
+                }
+            }
+        }
+    }
+    // Food dies.
+    var i = 0;
+    while (i < item.food.length) {
+        if (item.food[i].height <= 0) {
+            var index = this.food.indexOf(item.food[i]);
+            this.food.splice(index, 1);
+            item.food.splice(i, 1);
+        } else {
+            // Proceed to next food element in array.
             i++;
         }
     }
@@ -222,9 +240,17 @@ Environment.prototype.getMessages = function (x, y) {
 Environment.prototype.prepareEnvironmentInfo = function () {
     for (var i = this.minX; i <= this.maxX; i++) {
         for (var j = this.minY; j <= this.maxY; j++) {
+            // Microbes general info.
             for (var k = 0; k < this.env[i][j].microbes.length; k++) {
                 // TODO: check if giveEnvironmentInfo exists.
                 var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);
+                this.messages.push(message);
+                this.env[i][j].messages.push(message);
+            }
+            // Food general info.
+            for (var k = 0; k < this.env[i][j].food.length; k++) {
+                // TODO: check if giveEnvironmentInfo exists.
+                var message = new Message(this.env[i][j].food[k].giveEnvironmentInfo(), i, j, this, null);
                 this.messages.push(message);
                 this.env[i][j].messages.push(message);
             }

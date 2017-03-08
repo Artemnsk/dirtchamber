@@ -45,9 +45,6 @@ Microbe.prototype.live = function() {
         var microbe_move = function (move_x, move_y) {
             that.move(move_x, move_y);
         };
-        var microbe_eat = function () {
-            that.eat();
-        };
         var microbe_reproduce = function () {
             that.reproduce();
         };
@@ -57,7 +54,7 @@ Microbe.prototype.live = function() {
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
         // TODO: Get environment.
-        this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_eat, microbe_reproduce, microbe_yell);
+        this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_reproduce, microbe_yell);
     }
 };
 
@@ -107,13 +104,6 @@ Microbe.prototype.move = function(move_x, move_y) {
 
     // Put the microbe into the environment cell.
     this.env.env[this.x][this.y].microbes.push(this);
-};
-
-Microbe.prototype.eat = function() {
-   for (var index in this.env.env[this.x][this.y].food) {
-       this.hitpoints += Math.round(MICROBE_STARTING_HITPOINTS / 2.5);
-       this.env.env[this.x][this.y].food[index].height--;
-   }
 };
 
 /**

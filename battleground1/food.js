@@ -32,43 +32,39 @@ var Food = function(x, y, env, strategy) {
             break;
     }
     this.env.env[this.x][this.y].food.push(this);
+    this.env.food.push(this);
 };
 
 /**
  * Main food method which calculates a step of Food's life.
  */
 Food.prototype.live = function() {
-    this.move();
-    this.eat();
     this.reproduce();
-    this.die();
 };
 
 /**
- * Move Food in environment.
+ * Provide environment with info about this object.
  */
-Food.prototype.move = function() {
-
+Food.prototype.giveEnvironmentInfo = function() {
+    var text = {
+        'x': this.x,
+        'y': this.y,
+        'height': this.height
+    };
+    return JSON.stringify(text);
 };
 
-Food.prototype.eat = function() {
-
-};
-
-Food.prototype.reproduce = reproduceAndPlaceNearRandomly;
-/**
- * Food dies and removed from the environment.
- */
-Food.prototype.die = function() {
-    if (this.height <= 0) {
-        var index = this.env.food.indexOf(this);
-        this.env.food.splice(index, 1);
-        index = this.env.env[this.x][this.y].food.indexOf(this);
-        this.env.env[this.x][this.y].food.splice(index, 1);
-    }
-};
+Food.prototype.reproduce = noReproduction;
 
 //======== Reproduction strateges =========
+
+/**
+ * No reproduction.
+ */
+function noReproduction() {
+
+}
+
 /**
  * Food creates a new one near itself.
  */
@@ -81,7 +77,7 @@ function reproduceAndPlaceNearRandomly() {
                 if ( !(x == 1 && y == 1))
                 //if ( x != 1 && y != 1) - try it - it's funny!
                 // checking if that cell is null (or undefined). Should we check if it is empty?
-                    if (empty(this.env.env[this.x][this.y].microbes) && empty(this.env.env[this.x][this.y].food))
+                    if (this.env.env[this.x][this.y].microbes.length == 0)
                       if ( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.maxX) &&
                         (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.maxY))
                         possiblePlacements.push({
