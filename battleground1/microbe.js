@@ -29,10 +29,10 @@ var Microbe = function (x, y, env, strategy, hitpoints, player) {
         default:
             this.x = randomNumberFromRange(this.env.minX, this.env.maxX);
             this.y = randomNumberFromRange(this.env.minY, this.env.maxY);
-            this.env.microbes.push(this);
-            this.env.env[this.x][this.y].microbes.push(this);
             break;
     }
+    this.env.microbes.push(this);
+    this.env.env[this.x][this.y].microbes.push(this);
 };
 
 /**
@@ -71,7 +71,7 @@ Microbe.prototype.live = function() {
         };
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
-        this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_reproduce, microbe_yell);
+        this.player.algorithm.call(null, messages, this.x, this.y, this.hitpoints, microbe_move, microbe_reproduce, microbe_yell);
     }
 };
 
@@ -129,15 +129,9 @@ Microbe.prototype.move = function(move_x, move_y) {
  * Microbe creates a new one at the same position as itself.
  */
 Microbe.prototype.reproduce = function() {
-    var birthProbability = BIRTH_PROBABILITY;
-    var modifier = Math.round(this.hitpoints / MICROBE_STARTING_HITPOINTS);
-    var modifier = Math.min(modifier, 1);
-    birthProbability *= modifier;
-    if (Math.random() <= birthProbability) {
+    if (this.env.getMicrobesQuantityByPlayer(this.player, this.env.microbes) <= this.env.population_limit) {
         this.hitpoints = Math.round(this.hitpoints / 2);
-        var microbe = new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints, this.player);
-        this.env.env[this.x][this.y].microbes.push(microbe);
-        this.env.microbes.push(microbe);
+        new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints, this.player);
     }
 };
 

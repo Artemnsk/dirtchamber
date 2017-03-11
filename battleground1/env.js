@@ -13,7 +13,7 @@ const FOOD_REPRODUCTION_PROBABILITY = 0.005;
  * @param y
  * @constructor
  */
-var Environment = function (x, y) {
+var Environment = function (x, y, population_limit) {
     this.current_step = 0;
     // Initialize world boundaries.
     this.minX = 0;
@@ -26,7 +26,12 @@ var Environment = function (x, y) {
         y = 200;
     }
     this.maxY = y;
-
+    // Other configs.
+    if (population_limit != undefined) {
+        this.population_limit = population_limit;
+    } else {
+        this.population_limit = 2000;
+    }
     // Initialize environment array.
     this.microbes = [];
     this.messages = [];
@@ -51,7 +56,7 @@ Environment.prototype.draw = function() {
     var c = document.getElementById("Area");
     var ctx = c.getContext("2d");
 
-    var scale = 2;
+    var scale = 3;
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
     for (var x in this.env) {
         for (var y in this.env[x]) {
@@ -209,19 +214,15 @@ Environment.prototype.prepareEnvironmentInfo = function () {
         for (var j = this.minY; j <= this.maxY; j++) {
             // Microbes general info.
             for (var k = 0; k < this.env[i][j].microbes.length; k++) {
-                if (this.env[i][j].microbes[k].hasOwnProperty('giveEnvironmentInfo')) {
-                    var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);
-                    this.messages.push(message);
-                    this.env[i][j].messages.push(message);
-                }
+                var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);
+                this.messages.push(message);
+                this.env[i][j].messages.push(message);
             }
             // Food general info.
             for (var k = 0; k < this.env[i][j].food.length; k++) {
-                if (this.env[i][j].food[k].hasOwnProperty('giveEnvironmentInfo')) {
-                    var message = new Message(this.env[i][j].food[k].giveEnvironmentInfo(), i, j, this, null);
-                    this.messages.push(message);
-                    this.env[i][j].messages.push(message);
-                }
+                var message = new Message(this.env[i][j].food[k].giveEnvironmentInfo(), i, j, this, null);
+                this.messages.push(message);
+                this.env[i][j].messages.push(message);
             }
         }
     }
@@ -255,4 +256,17 @@ Environment.prototype.getOverallHitpointsByPlayer = function (microbes) {
         'players': players,
         'hitpoints': hitpoints_by_player
     }
+};
+
+/**
+ * Get microbes quantity by player.
+ */
+Environment.prototype.getMicrobesQuantityByPlayer = function (player, microbes) {
+    var q = 0;
+    for (var i = 0; i < microbes.length; i++) {
+        if (microbes[i].player === player) {
+            q++;
+        }
+    }
+    return q;
 };

@@ -3,12 +3,18 @@
  * @param env
  * @constructor
  */
-var Game = function (env, max_steps) {
-    // Set env.
+var Game = function (env, players, max_steps) {
+    // TODO: configs.
+    // TODO: bypass these settings into env?
+    // TODO: initialize env here?
+    this.microbes_starting_population = 1;
+    this.population_limit = 2000;
+    this.food_starting_population = 200;
     this.env = env;
+    this.players = players;
     this.status = 'prepare';
     if (max_steps == undefined) {
-        this.max_steps = Math.POSITIVE_INFINITY;
+        this.max_steps = 999999999999;
     }
     this.winner = null;
 };
@@ -17,48 +23,7 @@ var Game = function (env, max_steps) {
  * Initialize game.
  */
 Game.prototype.settle = function() {
-    // Create players.
-    var algorithm1 = function (messages, my_x, my_y, microbe_move, microbe_reproduce, microbe_yell) {
-        // 1. Parse message.
-        var found_food = false;
-        for (var i = 0; i < messages.length; i++) {
-            try {
-                var data = JSON.parse(messages[i].text);
-                if (data.type == 'food') {
-                    // Go to this food.
-                    microbe_move(data.x - my_x, data.y - my_y);
-                    found_food = true;
-                    break;
-                }
-            } catch (e) {}
-        }
-        if (!found_food) {
-            var move_x = randomNumberFromRange(-1, 2);
-            var move_y = randomNumberFromRange(-1, 2);
-            microbe_move(move_x, move_y);
-            microbe_move(move_x, move_y);
-        }
-        // FIXME: move once per step!!!
-        microbe_reproduce();
-        //microbe_yell('asd');
-    };
-    var algorithm2 = function (messages, my_x, my_y, microbe_move, microbe_reproduce, microbe_yell) {
-        var move_x = randomNumberFromRange(-1, 2);
-        var move_y = randomNumberFromRange(-1, 2);
-        microbe_move(move_x, move_y);
-        // FIXME: move once per step!!!
-        microbe_reproduce();
-    };
-    var player1 = new Player('player 1', 'red', algorithm1);
-    var player2 = new Player('player 2', 'blue', algorithm2);
-    // Create microbes for these players.
-    for (var i = 0; i < MICROBS_STARTING_POPULATION; i++) {
-        var current_player = (i % 2 == 0) ? player1 : player2;
-        new Microbe(null, null, this.env, {type: 'random'}, null, current_player);
-    }
-    for (var i = 0; i < FOOD_STARTING_POPULATION; i++) {
-        new Food(null, null, this.env, {type: 'random'});
-    }
+    randomSettle.call(this);
 };
 
 /**
@@ -133,4 +98,38 @@ Game.prototype.endGame = function() {
         text = "Game ended in a draw.";
     }
     $("#result").html(text);
+};
+
+
+
+/*************************************************************
+ * Help functions.
+ *************************************************************/
+/**
+ * Randomly places player microbes.
+ */
+var randomSettle = function () {
+    // Start coords depends on player quantity.
+    // TODO: depends on map size.
+    var coords = [];
+    switch (this.players.length) {
+        default:
+        case 2:
+            coords = [
+                {
+                    'x': this.env.minX,
+                    'y': Math.round(this.env.maxY/2)
+                }, {
+                    'x': this.env.maxX,
+                    'y': Math.round(this.env.maxY/2)
+                }
+            ];
+            break;
+    }
+    for (var p = 0; p < this.players.length; p++) {
+        new Microbe(coords[p].x, coords[p].y, this.env, {type: 'direct'}, 9999999, this.players[p]);
+    }
+    for (var i = 0; i < this.food_starting_population; i++) {
+        new Food(null, null, this.env, {type: 'random'});
+    }
 };
