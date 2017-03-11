@@ -42,18 +42,35 @@ Microbe.prototype.live = function() {
     if (this.player && this.player instanceof Player) {
         var that = this;
         // Secure operation to not allow player use the entire microbe object in algorithm.
+        var already_moved = false;
         var microbe_move = function (move_x, move_y) {
-            that.move(move_x, move_y);
+            if (already_moved == false) {
+                already_moved = true;
+                that.move(move_x, move_y);
+            } else {
+                //console.log(that.player.nickname + ': Move already being used on this step.')
+            }
         };
+        var already_reproduced = false;
         var microbe_reproduce = function () {
-            that.reproduce();
+            if (already_reproduced == false) {
+                already_reproduced = true;
+                that.reproduce();
+            } else {
+                //console.log(that.player.nickname + ': Reproduce already being used on this step.')
+            }
         };
+        var already_yelled = false;
         var microbe_yell = function (text) {
-            that.yell(text);
+            if (already_yelled == false) {
+                already_yelled = true;
+                that.yell(text);
+            } else {
+                //console.log(that.player.nickname + ': Yell already being used on this step.')
+            }
         };
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
-        // TODO: Get environment.
         this.player.algorithm.call(null, messages, this.x, this.y, microbe_move, microbe_reproduce, microbe_yell);
     }
 };
@@ -62,7 +79,6 @@ Microbe.prototype.live = function() {
  * Move microbe in environment.
  */
 Microbe.prototype.move = function(move_x, move_y) {
-    // FIXME: use isNumeric() of jQuery. Hope that's OK?
     // Convert non-number values into zero.
     if (!$.isNumeric(move_x)) {
         move_x = 0;
@@ -131,7 +147,6 @@ Microbe.prototype.reproduce = function() {
 Microbe.prototype.yell = function(text) {
     // Create message.
     var message = new Message(text, this.x, this.y, this.env, this.player);
-    // TODO: put this message by reference into appropriate cells in env.messageLayer.
     this.env.messages.push(message);
     this.env.env[this.x][this.y].messages.push(message);
 };

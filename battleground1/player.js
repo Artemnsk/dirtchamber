@@ -9,7 +9,7 @@ var Player = function (nickname, color, algorithm) {
     this.color = color;
     var that = this;
     // TODO:
-    this.algorithm = function (messages, my_x, my_y, microbe_move, microbe_reproduce, microbe_yell) {
+    this.algorithm = algorithm || function (messages, my_x, my_y, microbe_move, microbe_reproduce, microbe_yell) {
         // 1. Parse message.
         var found_food = false;
         for (var i = 0; i < messages.length; i++) {

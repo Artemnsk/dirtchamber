@@ -14,23 +14,23 @@ var chartDotCount = 20;
 var chartDotCountActual = 0;
 
 var mainEnv = new Environment();
-mainEnv.settle();
+var game = new Game(mainEnv, 100);
+game.settle();
 setInterval(function() {
-    mainEnv.step();
-    mainEnv.draw();
-    // Draw chart.
-    chartUpdateCounter++;
-    if(chartUpdateCounter == chartUpdateRate) {
-        var chart = $('#container').highcharts();
-        if(chartDotCountActual < chartDotCount) {
-            chart.series[0].addPoint(mainEnv.microbes.length);
-            chartDotCountActual++;
+    if (!game.processEnd()) {
+        mainEnv.step();
+        mainEnv.draw();
+        // Draw chart.
+        chartUpdateCounter++;
+        if(chartUpdateCounter == chartUpdateRate) {
+            var chart = $('#container').highcharts();
+            if(chartDotCountActual < chartDotCount) {
+                chart.series[0].addPoint(mainEnv.microbes.length);
+                chartDotCountActual++;
+            }
+            else
+                chart.series[0].addPoint(mainEnv.microbes.length, true, true);
+            chartUpdateCounter = 0;
         }
-        else
-            chart.series[0].addPoint(mainEnv.microbes.length, true, true);
-        chartUpdateCounter = 0;
     }
 }, 41);
-
-//console.log(mainEnv.microbes);
-//console.log(mainEnv.env);

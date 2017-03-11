@@ -45,24 +45,6 @@ var Environment = function (x, y) {
 };
 
 /**
- * Populate environment with microbes.
- * @param strategy
- */
-Environment.prototype.settle = function (strategy) {
-    // Create players.
-    var player1 = new Player('player 1', 'red', function (microbe) {});
-    var player2 = new Player('player 2', 'blue', function (microbe) {});
-    // Create microbes for these players.
-    for (var i = 0; i < MICROBS_STARTING_POPULATION; i++) {
-        var current_player = (i % 2 == 0) ? player1 : player2;
-        new Microbe(null, null, this, {type: 'random'}, null, current_player);
-    }
-    for (var i = 0; i < FOOD_STARTING_POPULATION; i++) {
-        new Food(null, null, this, {type: 'random'});
-    }
-};
-
-/**
  * Draw environment.
  */
 Environment.prototype.draw = function() {
@@ -126,30 +108,15 @@ Environment.prototype.step = function() {
 Environment.prototype.processLayerItem = function(item) {
     // Microbe 'battle'.
     if (item.microbes.length > 1) {
-        // 1. Collect different players.
-        var players = [];
-        for (var i = 0; i < item.microbes.length; i++) {
-            var index = players.indexOf(item.microbes[i].player);
-            if (index === -1) {
-                players.push(item.microbes[i].player);
-            }
-        }
-        // 2. Proceed with battle.
+        var players_and_hitpoints = this.getOverallHitpointsByPlayer(item.microbes);
+        var players = players_and_hitpoints.players;
+        var hitpoints = players_and_hitpoints.hitpoints;
+        // Players microbe battle.
         if (players.length > 1) {
-            // Player with maximum microbes hitpoints will win the battle.
-            var hitpoints_by_player = [];
-            // Set all to 0.
-            for (var i = 0; i < players.length; i++) {
-                hitpoints_by_player[i] = 0;
-            }
-            for (var i = 0; i < item.microbes.length; i++) {
-                var index = players.indexOf(item.microbes[i].player);
-                hitpoints_by_player[index] += item.microbes[i].hitpoints;
-            }
-            // Get index of max element in hitpoints_by_player;
+            // Get index of max element in hitpoints;
             var max_hitpoints_index = 0;
-            for (var i = 1; i < hitpoints_by_player.length; i++) {
-                if (hitpoints_by_player[i] > hitpoints_by_player[max_hitpoints_index]) {
+            for (var i = 1; i < hitpoints.length; i++) {
+                if (hitpoints[i] > hitpoints[max_hitpoints_index]) {
                     max_hitpoints_index = i;
                 }
             }
@@ -242,18 +209,50 @@ Environment.prototype.prepareEnvironmentInfo = function () {
         for (var j = this.minY; j <= this.maxY; j++) {
             // Microbes general info.
             for (var k = 0; k < this.env[i][j].microbes.length; k++) {
-                // TODO: check if giveEnvironmentInfo exists.
-                var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);
-                this.messages.push(message);
-                this.env[i][j].messages.push(message);
+                if (this.env[i][j].microbes[k].hasOwnProperty('giveEnvironmentInfo')) {
+                    var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);
+                    this.messages.push(message);
+                    this.env[i][j].messages.push(message);
+                }
             }
             // Food general info.
             for (var k = 0; k < this.env[i][j].food.length; k++) {
-                // TODO: check if giveEnvironmentInfo exists.
-                var message = new Message(this.env[i][j].food[k].giveEnvironmentInfo(), i, j, this, null);
-                this.messages.push(message);
-                this.env[i][j].messages.push(message);
+                if (this.env[i][j].food[k].hasOwnProperty('giveEnvironmentInfo')) {
+                    var message = new Message(this.env[i][j].food[k].giveEnvironmentInfo(), i, j, this, null);
+                    this.messages.push(message);
+                    this.env[i][j].messages.push(message);
+                }
             }
         }
+    }
+};
+
+
+
+/*************************************************************
+ * Help functions.
+ *************************************************************/
+/**
+ * Get overall microbes hitpoints by player from some obj.
+ * Respond with {'players': [], 'hitpoints': []};
+ * @param microbes - microbes array.
+ */
+Environment.prototype.getOverallHitpointsByPlayer = function (microbes) {
+    var players = [];
+    var hitpoints_by_player = [];
+    for (var i = 0; i < microbes.length; i++) {
+        var player_index = players.indexOf(microbes[i].player);
+        // If that was new player we should push it into array and set it's index manually.
+        if (player_index === -1) {
+            players.push(microbes[i].player);
+            player_index = players.length - 1;
+            // Set new index to 0.
+            hitpoints_by_player[player_index] = 0;
+        }
+        hitpoints_by_player[player_index] += microbes[i].hitpoints;
+    }
+    return {
+        'players': players,
+        'hitpoints': hitpoints_by_player
     }
 };
