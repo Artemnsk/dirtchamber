@@ -1,20 +1,95 @@
 <html>
 <head>
-    <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="theme_hc.js"></script>
-    <script src="player.js"></script>
-    <script src="message.js"></script>
-    <script src="microbe.js"></script>
-    <script src="food.js"></script>
-    <script src="game.js"></script>
-    <script src="env.js"></script>
-    <script src="hc.js"></script>
-    <script src="god.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<canvas id="Area" width="800" height="800" style="float: left;"></canvas>
-<div id="result"></div>
-<div id="container" style="width:800px; height:400px;float: left;"></div>
+<table class="game-table">
+    <tr>
+        <td rowspan=2 id="player1" class="player-panel">
+            <h3>Nickname</h3>
+            <input name="nickname" value="Player 1" />
+            <h3>Color</h3>
+            <input name="color" value="red" />
+            <h3>Algorithm</h3>
+            <textarea rows="30" name="algorithm">
+                // Parse messages. Search for info about food near.
+                // Move to food and stay on that food until it eaten.
+                // Move randomly otherwise.
+                // Reproduce sometimes.
+                var found_food = false;
+                for (var i = 0; i < messages.length; i++) {
+                    try {
+                        var data = JSON.parse(messages[i].text);
+                        if (data.type == 'food') {
+                            // Go to this food.
+                            microbe_move(data.x - my_x, data.y - my_y);
+                            found_food = true;
+                            break;
+                        }
+                    } catch (e) {}
+                }
+                if (!found_food) {
+                    var move_x = randomNumberFromRange(-1, 2);
+                    var move_y = randomNumberFromRange(-1, 2);
+                    microbe_move(move_x, move_y);
+                    microbe_move(move_x, move_y);
+                }
+                var birthProbability = BIRTH_PROBABILITY;
+                var modifier = Math.round(my_hitpoints / MICROBE_STARTING_HITPOINTS);
+                var modifier = Math.min(modifier, 1);
+                birthProbability *= modifier;
+                if (Math.random() <= birthProbability) {
+                    microbe_reproduce();
+                }
+                // That's how microbe can give message to teammate microbes in radius=2 in any text format.
+                // microbe_yell('asd');
+            </textarea>
+        </td>
+        <td class="game-map">
+            <canvas id="Area"></canvas>
+            <button onclick="startGame()">Start</button>
+        </td>
+        <td rowspan=2 id="player2" class="player-panel">
+            <h3>Nickname</h3>
+            <input name="nickname" value="Player 2" />
+            <h3>Color</h3>
+            <input name="color" value="blue" />
+            <h3>Algorithm</h3>
+            <textarea rows="30" name="algorithm" value="">
+                // Move randomly.
+                // Reproduce sometimes.
+                var move_x = randomNumberFromRange(-1, 2);
+                var move_y = randomNumberFromRange(-1, 2);
+                microbe_move(move_x, move_y);
+                var birthProbability = BIRTH_PROBABILITY;
+                var modifier = Math.round(my_hitpoints / MICROBE_STARTING_HITPOINTS);
+                var modifier = Math.min(modifier, 1);
+                birthProbability *= modifier;
+                if (Math.random() <= birthProbability) {
+                    microbe_reproduce();
+                }
+            </textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div id="result"></div>
+            <div id="container" style="width:800px; height:400px;float: left;"></div>
+        </td>
+    </tr>
+</table>
+
+<script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="theme_hc.js"></script>
+<script src="player.js"></script>
+<script src="message.js"></script>
+<script src="microbe.js"></script>
+<script src="food.js"></script>
+<script src="game.js"></script>
+<script src="env.js"></script>
+<!--<script src="hc.js"></script>-->
+<script src="god.js"></script>
+
 </body>
 </html>

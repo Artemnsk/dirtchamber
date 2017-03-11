@@ -27,6 +27,7 @@ var Environment = function (x, y, population_limit) {
     }
     this.maxY = y;
     // Other configs.
+    this.draw_scale = 3;
     if (population_limit != undefined) {
         this.population_limit = population_limit;
     } else {
@@ -47,6 +48,11 @@ var Environment = function (x, y, population_limit) {
             };
         }
     }
+    // Initialize canvas size.
+    var c = document.getElementById("Area");
+    var ctx = c.getContext("2d");
+    ctx.canvas.height = (this.maxY - this.minY)*this.draw_scale;
+    ctx.canvas.width = (this.maxX - this.minX)*this.draw_scale;
 };
 
 /**
@@ -56,7 +62,7 @@ Environment.prototype.draw = function() {
     var c = document.getElementById("Area");
     var ctx = c.getContext("2d");
 
-    var scale = 3;
+    var scale = this.draw_scale;
     ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
     for (var x in this.env) {
         for (var y in this.env[x]) {
