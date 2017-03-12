@@ -116,13 +116,21 @@ Use this function with x, y coordinates parameters. You can use this function on
 Just nothing will happen if you perform moving by the same microbe twice per step.
 
 ### *microbe_reproduce*
-(Function(inner_info))
+(Function(data))
 
 Use this function to 'split' current microbe into 2 ones.
-Hitpoints of current microbe will be split into 2 equal parts.
-You can pass inner_info text parameter to set inner_info for newly created microbe.
+Hitpoints of current microbe will be decreased by amount provided in data object.
+You can pass inner_info text parameter to set inner_info for newly created microbe in data object.
 This function can be used only once per environment step.
 Microbe generated with this function can start 'live' only on next environment step.
+```json
+// data.
+{
+    "hitpoints": "<half of current microbe hitpoints will be used by default>",
+    "inner_info": "<empty string by default>"
+}
+
+```
 
 ### *microbe_yell*
 (Function(text))
