@@ -91,8 +91,8 @@ Environment.prototype.step = function() {
         }
     }
     // "Process" environment.
-    for (i in this.env) {
-        for (j in this.env[i]) {
+    for (var i in this.env) {
+        for (var j in this.env[i]) {
             // Process layer item.
             this.processLayerItem(this.env[i][j]);
         }
@@ -132,7 +132,7 @@ Environment.prototype.processLayerItem = function(item) {
             var winner = players[max_hitpoints_index];
             // Even if value is the same the winner will be pseudo-random - you never know which microbe goes first in the layer.
             for (var i = 0; i < item.microbes.length; i++) {
-                if (item.microbes[i].player != winner) {
+                if (item.microbes[i].player !== winner) {
                     // Dying will be calculated further.
                     item.microbes[i].hitpoints = 0;
                 }
@@ -145,7 +145,7 @@ Environment.prototype.processLayerItem = function(item) {
         // Decrease hitpoints at first.
         item.microbes[i].hitpoints -= 41;
         if (item.microbes[i].hitpoints <= 0) {
-            index = this.microbes.indexOf(item.microbes[i]);
+            var index = this.microbes.indexOf(item.microbes[i]);
             this.microbes.splice(index, 1);
             item.microbes.splice(i, 1);
         } else {
@@ -259,7 +259,7 @@ Environment.prototype.getOverallHitpointsByPlayer = function (microbes) {
     return {
         'players': players,
         'hitpoints': hitpoints_by_player
-    }
+    };
 };
 
 /**
