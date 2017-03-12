@@ -5,32 +5,13 @@
  * @param env
  * @constructor
  */
-var Microbe = function (x, y, env, strategy, hitpoints, player) {
-    if (!hitpoints) {
-        hitpoints = MICROBE_STARTING_HITPOINTS;
-    }
+var Microbe = function (x, y, env, hitpoints, player) {
     this.player = player;
     this.env = env;
     this.speed = 1;
     this.hitpoints = hitpoints;
-    if (typeof strategy == 'undefined') {
-        strategy = {
-            type: 'random',
-            data: {startingPopulation: MICROBS_STARTING_POPULATION}
-        }
-    }
-
-    switch (strategy.type) {
-        case 'direct':
-            this.x = x;
-            this.y = y;
-            break;
-        case 'random':
-        default:
-            this.x = randomNumberFromRange(this.env.minX, this.env.maxX);
-            this.y = randomNumberFromRange(this.env.minY, this.env.maxY);
-            break;
-    }
+    this.x = x;
+    this.y = y;
     this.env.microbes.push(this);
     this.env.env[this.x][this.y].microbes.push(this);
 };
@@ -108,17 +89,17 @@ Microbe.prototype.move = function(move_x, move_y) {
     this.x += this.speed * move_x;
     this.y += this.speed * move_y;
     // Check for out of bounds scenario.
-    if (this.x < this.env.minX) {
-        this.x = this.env.minX;
+    if (this.x < this.env.configs.minX) {
+        this.x = this.env.configs.minX;
     }
-    else if (this.x >= this.env.maxX) {
-        this.x = this.env.maxX - 1;
+    else if (this.x >= this.env.configs.maxX) {
+        this.x = this.env.configs.maxX - 1;
     }
-    if (this.y < this.env.minY) {
-        this.y = this.env.minY;
+    if (this.y < this.env.configs.minY) {
+        this.y = this.env.configs.minY;
     }
-    else if (this.y >= this.env.maxY) {
-        this.y = this.env.maxY - 1;
+    else if (this.y >= this.env.configs.maxY) {
+        this.y = this.env.configs.maxY - 1;
     }
 
     // Put the microbe into the environment cell.
@@ -129,9 +110,9 @@ Microbe.prototype.move = function(move_x, move_y) {
  * Microbe creates a new one at the same position as itself.
  */
 Microbe.prototype.reproduce = function() {
-    if (this.env.getMicrobesQuantityByPlayer(this.player, this.env.microbes) <= this.env.population_limit) {
+    if (this.env.getMicrobesQuantityByPlayer(this.player, this.env.microbes) <= this.env.configs.population_limit) {
         this.hitpoints = Math.round(this.hitpoints / 2);
-        new Microbe(this.x, this.y, this.env, {type:'direct'}, this.hitpoints, this.player);
+        new Microbe(this.x, this.y, this.env, this.hitpoints, this.player);
     }
 };
 

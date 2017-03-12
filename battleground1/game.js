@@ -1,21 +1,20 @@
 /**
  * Game constructor.
- * @param env
- * @constructor
+ * @param players
+ * @param game_configs
+ *  {
+        'max_steps': 9999999999,
+        'microbes_starting_population': 1,
+        'food_starting_population': 200,
+    };
+ @param env_configs
+    see Environment configs.
  */
-var Game = function (env, players, max_steps) {
-    // TODO: configs.
-    // TODO: bypass these settings into env?
-    // TODO: initialize env here?
-    this.microbes_starting_population = 1;
-    this.population_limit = 2000;
-    this.food_starting_population = 200;
-    this.env = env;
+var Game = function (players, game_configs, env_configs) {
+    this.configs = game_configs;
+    this.env = new Environment(env_configs);
     this.players = players;
     this.status = 'prepare';
-    if (max_steps == undefined) {
-        this.max_steps = 999999999999;
-    }
     this.winner = null;
 };
 
@@ -66,7 +65,7 @@ Game.prototype.processEnd = function() {
         return true;
     }
     // 2. Maximum steps.
-    if (this.env.current_step >= this.max_steps) {
+    if (this.env.current_step >= this.configs.max_steps) {
         // Collect different players.
         var players_and_hitpoints = this.getOverallHitpointsByPlayer(this.env.microbes);
         var players = players_and_hitpoints.players;
@@ -117,19 +116,23 @@ var randomSettle = function () {
         case 2:
             coords = [
                 {
-                    'x': this.env.minX,
-                    'y': Math.round(this.env.maxY/2)
+                    'x': this.env.configs.minX,
+                    'y': Math.round(this.env.configs.maxY/2)
                 }, {
-                    'x': this.env.maxX,
-                    'y': Math.round(this.env.maxY/2)
+                    'x': this.env.configs.maxX,
+                    'y': Math.round(this.env.configs.maxY/2)
                 }
             ];
             break;
     }
-    for (var p = 0; p < this.players.length; p++) {
-        new Microbe(coords[p].x, coords[p].y, this.env, {type: 'direct'}, 9999999, this.players[p]);
-    }
-    for (var i = 0; i < this.food_starting_population; i++) {
-        new Food(null, null, this.env, {type: 'random'});
+    for (var i = 0; i < this.configs.microbes_starting_population; i++) {
+        for (var p = 0; p < this.players.length; p++) {
+            new Microbe(coords[p].x, coords[p].y, this.env, 9999999, this.players[p]);
+        }
+        for (var f = 0; f < this.configs.food_starting_population; f++) {
+            var x = randomNumberFromRange(this.env.configs.minX, this.env.configs.maxX);
+            var y = randomNumberFromRange(this.env.configs.minY, this.env.configs.maxY);
+            new Food(x, y, this.env);
+        }
     }
 };

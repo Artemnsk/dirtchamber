@@ -1,46 +1,29 @@
-const MICROBS_STARTING_POPULATION = 1000;
-const DEATH_PROBABILITY = 0.005;
-const BIRTH_PROBABILITY = 0.005;
-const MICROBE_STARTING_HITPOINTS = 2000;
-const MESSAGE_RADIUS = 2;
-
-const FOOD_STARTING_POPULATION = 200;
-const FOOD_REPRODUCTION_PROBABILITY = 0.005;
-
 /**
  * Environment constructor.
- * @param x
- * @param y
+ * @param configs
+ *  {
+        'maxX': 200,
+        'maxY': 200,
+        'minX': 0,
+        'minY': 0,
+        'population_limit': 500,
+        'draw_scale': 3,
+        'hitpoints_per_food': 1000,
+        'message_radius': 2,
+    };
  * @constructor
  */
-var Environment = function (x, y, population_limit) {
+var Environment = function (configs) {
+    this.configs = configs;
     this.current_step = 0;
-    // Initialize world boundaries.
-    this.minX = 0;
-    this.minY = 0;
-    if (typeof x == 'undefined') {
-        x = 200;
-    }
-    this.maxX = x;
-    if (typeof y == 'undefined') {
-        y = 200;
-    }
-    this.maxY = y;
-    // Other configs.
-    this.draw_scale = 3;
-    if (population_limit != undefined) {
-        this.population_limit = population_limit;
-    } else {
-        this.population_limit = 2000;
-    }
     // Initialize environment array.
     this.microbes = [];
     this.messages = [];
     this.food = [];
     this.env = {};
-    for (i = this.minX; i <= this.maxX; i++) {
+    for (i = this.configs.minX; i <= this.configs.maxX; i++) {
         this.env[i] = {};
-        for (j = this.minY; j <= this.maxY; j++) {
+        for (j = this.configs.minY; j <= this.configs.maxY; j++) {
             this.env[i][j] = {
                 'microbes': [],
                 'messages': [],
@@ -51,8 +34,8 @@ var Environment = function (x, y, population_limit) {
     // Initialize canvas size.
     var c = document.getElementById("Area");
     var ctx = c.getContext("2d");
-    ctx.canvas.height = (this.maxY - this.minY)*this.draw_scale;
-    ctx.canvas.width = (this.maxX - this.minX)*this.draw_scale;
+    ctx.canvas.height = (this.configs.maxY - this.configs.minY)*this.configs.draw_scale;
+    ctx.canvas.width = (this.configs.maxX - this.configs.minX)*this.configs.draw_scale;
 };
 
 /**
@@ -62,8 +45,8 @@ Environment.prototype.draw = function() {
     var c = document.getElementById("Area");
     var ctx = c.getContext("2d");
 
-    var scale = this.draw_scale;
-    ctx.clearRect(0, 0, this.maxX * scale, this.maxY * scale);
+    var scale = this.configs.draw_scale;
+    ctx.clearRect(0, 0, this.configs.maxX * scale, this.configs.maxY * scale);
     for (var x in this.env) {
         for (var y in this.env[x]) {
             if (this.env[x][y].microbes.length > 0) {
@@ -158,7 +141,7 @@ Environment.prototype.processLayerItem = function(item) {
     // Eat. That's better to do it after battle and dying to not resurrect dead microbe.
     // That's easy. Each microbe which stays on food can eat it.
     if (item.food.length > 0 && item.microbes.length > 0) {
-        // Each microbe eats the first avaikabke food.
+        // Each microbe eats the first available food.
         for (var i = 0; i < item.microbes.length; i++) {
             for (var j = 0; j < item.food.length; j++) {
                 if (item.food[j].height <= 0) {
@@ -167,7 +150,7 @@ Environment.prototype.processLayerItem = function(item) {
                 } else {
                     // Feed. We will delete eaten food later.
                     item.food[j].height--;
-                    item.microbes[i].hitpoints += Math.round(MICROBE_STARTING_HITPOINTS / 2.5);
+                    item.microbes[i].hitpoints += Math.round(this.configs.hitpoints_per_food);
                 }
             }
         }
@@ -193,10 +176,10 @@ Environment.prototype.processLayerItem = function(item) {
  */
 Environment.prototype.getMessages = function (x, y) {
     var response = [];
-    for (var i = x - MESSAGE_RADIUS; i <= x + MESSAGE_RADIUS; i++) {
-        if ((this.minX <= i) && (i <= this.maxX)) {
-            for (var j = y - MESSAGE_RADIUS; j <= y + MESSAGE_RADIUS; j++) {
-                if ((this.minY <= j) && (j <= this.maxY)) {
+    for (var i = x - this.configs.message_radius; i <= x + this.configs.message_radius; i++) {
+        if ((this.configs.minX <= i) && (i <= this.configs.maxX)) {
+            for (var j = y - this.configs.message_radius; j <= y + this.configs.message_radius; j++) {
+                if ((this.configs.minY <= j) && (j <= this.configs.maxY)) {
                     for (var index = 0; index < this.env[i][j].messages.length; index++) {
                         // If message was not created on current step.
                         if (this.env[i][j].messages[index].step < this.current_step) {
@@ -216,8 +199,8 @@ Environment.prototype.getMessages = function (x, y) {
  * Asks for each object in environment and puts it's info message into appropriate place.
  */
 Environment.prototype.prepareEnvironmentInfo = function () {
-    for (var i = this.minX; i <= this.maxX; i++) {
-        for (var j = this.minY; j <= this.maxY; j++) {
+    for (var i = this.configs.minX; i <= this.configs.maxX; i++) {
+        for (var j = this.configs.minY; j <= this.configs.maxY; j++) {
             // Microbes general info.
             for (var k = 0; k < this.env[i][j].microbes.length; k++) {
                 var message = new Message(this.env[i][j].microbes[k].giveEnvironmentInfo(), i, j, this, null);

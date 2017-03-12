@@ -10,27 +10,8 @@ var Food = function(x, y, env, strategy) {
     this.y = y;
     this.env = env;
     this.height = 10;
-
-    if (typeof strategy == 'undefined') {
-        strategy = {
-            type: 'random',
-            data: {
-                startingPopulation: FOOD_STARTING_POPULATION
-            }
-        }
-    }
-
-    switch (strategy.type) {
-        case 'direct':
-            this.x = x;
-            this.y = y;
-            break;
-        case 'random':
-        default:
-            this.x = randomNumberFromRange(this.env.minX, this.env.maxX);
-            this.y = randomNumberFromRange(this.env.minY, this.env.maxY);
-            break;
-    }
+    this.x = x;
+    this.y = y;
     this.env.env[this.x][this.y].food.push(this);
     this.env.food.push(this);
 };
@@ -70,7 +51,7 @@ function noReproduction() {
  * Food creates a new one near itself.
  */
 function reproduceAndPlaceNearRandomly() {
-    if (Math.random() <= FOOD_REPRODUCTION_PROBABILITY) {
+    if (Math.random() <= 0.005/*FOOD_REPRODUCTION_PROBABILITY*/) {
         var possiblePlacements = [];
         var vars = [-1, 0, 1];
         for (var x in vars)
@@ -79,8 +60,8 @@ function reproduceAndPlaceNearRandomly() {
                 //if ( x != 1 && y != 1) - try it - it's funny!
                 // checking if that cell is null (or undefined). Should we check if it is empty?
                     if (this.env.env[this.x][this.y].microbes.length == 0)
-                      if ( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.maxX) &&
-                        (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.maxY))
+                      if ( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.configs.maxX) &&
+                        (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.configs.maxY))
                         possiblePlacements.push({
                             x: this.x + vars[x],
                             y: this.y + vars[y]
@@ -98,7 +79,7 @@ function reproduceAndPlaceNearRandomly() {
 }
 
 function reproduceUderYouself () {
-    if (Math.random() <= FOOD_REPRODUCTION_PROBABILITY) {
+    if (Math.random() <= 0.005/*FOOD_REPRODUCTION_PROBABILITY*/) {
         var x = this.x,
             y = this.y;
 
