@@ -34,11 +34,7 @@
                     microbe_move(move_x, move_y);
                     microbe_move(move_x, move_y);
                 }
-                var birthProbability = BIRTH_PROBABILITY;
-                var modifier = Math.round(my_hitpoints / MICROBE_STARTING_HITPOINTS);
-                var modifier = Math.min(modifier, 1);
-                birthProbability *= modifier;
-                if (Math.random() <= birthProbability) {
+                if (Math.random() <= 0.05) {
                     microbe_reproduce();
                 }
                 // That's how microbe can give message to teammate microbes in radius=2 in any text format.
@@ -61,11 +57,7 @@
                 var move_x = randomNumberFromRange(-1, 2);
                 var move_y = randomNumberFromRange(-1, 2);
                 microbe_move(move_x, move_y);
-                var birthProbability = BIRTH_PROBABILITY;
-                var modifier = Math.round(my_hitpoints / MICROBE_STARTING_HITPOINTS);
-                var modifier = Math.min(modifier, 1);
-                birthProbability *= modifier;
-                if (Math.random() <= birthProbability) {
+                if (Math.random() <= 0.05) {
                     microbe_reproduce();
                 }
             </textarea>
@@ -80,15 +72,12 @@
 </table>
 
 <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="theme_hc.js"></script>
 <script src="player.js"></script>
 <script src="message.js"></script>
 <script src="microbe.js"></script>
 <script src="food.js"></script>
 <script src="game.js"></script>
 <script src="env.js"></script>
-<!--<script src="hc.js"></script>-->
 <script src="god.js"></script>
 
 </body>

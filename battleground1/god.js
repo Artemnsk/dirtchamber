@@ -8,11 +8,6 @@ function randomNumberFromRange(min,max){
     return Math.floor(Math.random()*(max-min)+min);
 }
 
-var chartUpdateRate = 12;
-var chartUpdateCounter = 0;
-var chartDotCount = 20;
-var chartDotCountActual = 0;
-
 var startGame = function () {
     // Create players.
     var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell) {
@@ -71,40 +66,6 @@ var startGame = function () {
         if (!game.processEnd()) {
             mainEnv.step();
             mainEnv.draw();
-            // Draw chart.
-            chartUpdateCounter++;
-            if(chartUpdateCounter == chartUpdateRate) {
-                var chart = $('#container').highcharts();
-                if(chartDotCountActual < chartDotCount) {
-                    chart.series[0].addPoint(mainEnv.microbes.length);
-                    chartDotCountActual++;
-                }
-                else
-                    chart.series[0].addPoint(mainEnv.microbes.length, true, true);
-                chartUpdateCounter = 0;
-            }
         }
     }, 41);
-    // HIGHCHARTS.
-    var chart1 = new Highcharts.Chart({
-        chart: {
-            renderTo: 'container',
-            type: 'spline'
-        },
-        title: {
-            text: 'Count of microbes'
-        },
-        //xAxis: {
-        //    categories: x..time
-        //},
-        //yAxis: {
-        //    title: {
-        //        text: 'Pizdyuki'
-        //    }
-        //},
-        series: [{
-            name: 'count',
-            data: [mainEnv.microbes.length]
-        }]
-    });
 };
