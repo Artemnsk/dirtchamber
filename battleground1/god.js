@@ -50,7 +50,7 @@ var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, mic
     for (var i = 0; i < messages.length; i++) {
         try {
             var data = JSON.parse(messages[i].text);
-            if (data.type == 'food') {
+            if (data.type === 'food') {
                 // Go to this food.
                 microbe_move(data.x - my_x, data.y - my_y);
                 found_food = true;
