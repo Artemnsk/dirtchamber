@@ -37,10 +37,13 @@ Microbe.prototype.live = function() {
             }
         };
         var already_reproduce_requested = false;
-        var microbe_reproduce_request = function () {
+        var microbe_reproduce_request = function (inner_info) {
+            if (inner_info === undefined) {
+                inner_info = '';
+            }
             if (already_reproduce_requested === false) {
                 already_reproduce_requested = true;
-                that.reproduce_request();
+                that.reproduce_request(inner_info);
             } else {
                 //console.log(that.player.nickname + ': Reproduce request already being used on this step.')
             }
@@ -118,19 +121,20 @@ Microbe.prototype.move = function(move_x, move_y) {
  * Microbe 'asks' environment to reproduce himself.
  * In fact that happens after all microbes 'live' to not let players abuse continuous microbes creation.
  */
-Microbe.prototype.reproduce_request = function() {
+Microbe.prototype.reproduce_request = function(inner_info) {
     if (this.env.microbes_to_reproduce.indexOf(this) === -1) {
         this.env.microbes_to_reproduce.push(this);
+        this.env.microbes_to_reproduce_inner_info.push(inner_info);
     }
 };
 
 /**
  * Microbe creates a new one at the same position as itself.
  */
-Microbe.prototype.reproduce = function() {
+Microbe.prototype.reproduce = function(inner_info) {
     if (this.env.getMicrobesQuantityByPlayer(this.player, this.env.microbes) <= this.env.configs.population_limit) {
         this.hitpoints = Math.round(this.hitpoints / 2);
-        new Microbe(this.x, this.y, this.env, this.hitpoints, this.player, '');
+        new Microbe(this.x, this.y, this.env, this.hitpoints, this.player, inner_info);
     }
 };
 
