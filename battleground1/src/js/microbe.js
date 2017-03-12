@@ -5,7 +5,7 @@
  * @param env
  * @constructor
  */
-var Microbe = function (x, y, env, hitpoints, player) {
+var Microbe = function (x, y, env, hitpoints, player, inner_info) {
     this.player = player;
     this.env = env;
     this.speed = 1;
@@ -14,6 +14,10 @@ var Microbe = function (x, y, env, hitpoints, player) {
     this.y = y;
     this.env.microbes.push(this);
     this.env.env[this.x][this.y].microbes.push(this);
+    if (inner_info === undefined) {
+        inner_info = '';
+    }
+    this.inner_info = inner_info;
 };
 
 /**
@@ -50,9 +54,13 @@ Microbe.prototype.live = function() {
                 //console.log(that.player.nickname + ': Yell already being used on this step.')
             }
         };
+        // Set inner_info.
+        var microbe_set_inner_info = function (inner_info) {
+            that.setInnerInfo(inner_info);
+        };
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
-        this.player.algorithm.call(null, messages, this.x, this.y, this.hitpoints, microbe_move, microbe_reproduce_request, microbe_yell);
+        this.player.algorithm.call(null, messages, this.x, this.y, this.hitpoints, this.inner_info, microbe_move, microbe_reproduce_request, microbe_yell, microbe_set_inner_info);
     }
 };
 
@@ -122,7 +130,7 @@ Microbe.prototype.reproduce_request = function() {
 Microbe.prototype.reproduce = function() {
     if (this.env.getMicrobesQuantityByPlayer(this.player, this.env.microbes) <= this.env.configs.population_limit) {
         this.hitpoints = Math.round(this.hitpoints / 2);
-        new Microbe(this.x, this.y, this.env, this.hitpoints, this.player);
+        new Microbe(this.x, this.y, this.env, this.hitpoints, this.player, '');
     }
 };
 
@@ -145,7 +153,15 @@ Microbe.prototype.giveEnvironmentInfo = function() {
         'y': this.y,
         'player': this.player.nickname,
         'type': 'microbe',
-        'hitpoints': this.hitpoints
+        'hitpoints': this.hitpoints,
+        'inner_info': this.inner_info
     };
     return JSON.stringify(text);
+};
+
+/**
+ * Sets inner info.
+ */
+Microbe.prototype.setInnerInfo = function(inner_info) {
+    this.inner_info = inner_info;
 };

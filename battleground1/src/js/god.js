@@ -9,8 +9,8 @@ function randomNumberFromRange(min,max){
 }
 
 var startGame = function () {
-    algorithm1 = new Function("messages", "my_x", "my_y", "my_hitpoints", "microbe_move", "microbe_reproduce", "microbe_yell", $('#player1 *[name="algorithm"]').val());
-    algorithm2 = new Function("messages", "my_x", "my_y", "my_hitpoints", "microbe_move", "microbe_reproduce", "microbe_yell", $('#player2 *[name="algorithm"]').val());
+    algorithm1 = new Function("messages", "my_x", "my_y", "my_hitpoints", "my_inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player1 *[name="algorithm"]').val());
+    algorithm2 = new Function("messages", "my_x", "my_y", "my_hitpoints", "my_inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player2 *[name="algorithm"]').val());
     var player1 = new Player($('#player1 *[name="nickname"]').val(), $('#player1 *[name="color"]').val(), algorithm1);
     var player2 = new Player($('#player2 *[name="nickname"]').val(), $('#player2 *[name="color"]').val(), algorithm2);
     var players = [player1, player2];
@@ -33,6 +33,7 @@ var startGame = function () {
     game.settle();
     setInterval(function() {
         if (!game.processEnd()) {
+            // TODO: do it without env middleware?
             game.env.step();
             game.env.draw();
         }
@@ -44,7 +45,7 @@ var startGame = function () {
 
 
 // Create players.
-var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell) {
+var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
     // 1. Parse message.
     var found_food = false;
     for (var i = 0; i < messages.length; i++) {
@@ -70,7 +71,7 @@ var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, mic
     // That's how microbe can give message to teammate microbes in radius=2 in any text format.
     // microbe_yell('asd');
 };
-var algorithm2 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell) {
+var algorithm2 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
     var move_x = randomNumberFromRange(-1, 2);
     var move_y = randomNumberFromRange(-1, 2);
     microbe_move(move_x, move_y);

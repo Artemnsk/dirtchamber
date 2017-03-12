@@ -1,6 +1,6 @@
 <html>
 <head>
-    <link rel="stylesheet" href="assets/style.css" />
+    <link rel="stylesheet" href="public/style.css" />
 </head>
 <body>
 <table class="game-table">
@@ -39,6 +39,7 @@
                 }
                 // That's how microbe can give message to teammate microbes in radius=2 in any text format.
                 // microbe_yell('asd');
+                microbe_set_inner_info(Math.random());
             </textarea>
         </td>
         <td class="game-map">
@@ -72,7 +73,7 @@
 </table>
 
 <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
-<script src="dist/dirtchamber.min.js"></script>
+<script src="public/app.min.js"></script>
 
 </body>
 </html>

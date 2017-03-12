@@ -127,7 +127,7 @@ var randomSettle = function () {
     }
     for (var i = 0; i < this.configs.microbes_starting_population; i++) {
         for (var p = 0; p < this.players.length; p++) {
-            new Microbe(coords[p].x, coords[p].y, this.env, 9999999, this.players[p]);
+            new Microbe(coords[p].x, coords[p].y, this.env, 9999999, this.players[p], '');
         }
         for (var f = 0; f < this.configs.food_starting_population; f++) {
             var x = randomNumberFromRange(this.env.configs.minX, this.env.configs.maxX);

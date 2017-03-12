@@ -15,25 +15,20 @@ module.exports = function(grunt) {
                 shadow: true
             }
         },
-        concat: {
-            options: {
-                separator: '\n'
-            },
-            dist: {
-                src: ['player.js', 'message.js', 'microbe.js', 'food.js', 'game.js', 'env.js', 'god.js'],
-                dest: 'dist/dirtchamber.js'
-            }
-        },
         uglify: {
             dist: {
                 files: {
-                    'dist/dirtchamber.min.js': ['<%= concat.dist.dest %>']
+                    'public/app.min.js': ['src/js/**/*.js']
                 }
+            },
+            options: {
+                'sourceMap': true,
+                'sourceMapIncludeSources': true
             }
         },
         watch: {
             scripts: {
-                files: ['<%= jshint.files %>'],
+                files: "src/js/**/*.js",
                 tasks: ['default'],
                 options: {
                     spawn: true,
@@ -41,7 +36,7 @@ module.exports = function(grunt) {
                 }
             },
             assets: {
-                files: ['assets/*.scss'],
+                files: ['src/scss/**/*.scss'],
                 tasks: ['sass'],
                 options: {
                     spawn: true,
@@ -52,7 +47,7 @@ module.exports = function(grunt) {
         sass: {
             dist: {
                 files: {
-                    "assets/style.css": "assets/style.scss"
+                    "public/style.css": "src/scss/**/*.scss"
                 }
             }
         }
@@ -61,8 +56,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-sass');
 
-    grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'uglify']);
 };
