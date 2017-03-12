@@ -18,7 +18,7 @@ var Environment = function (configs) {
     this.current_step = 0;
     // Reproduce query.
     this.microbes_to_reproduce = [];
-    this.microbes_to_reproduce_inner_info = [];
+    this.microbes_to_reproduce_data = [];
     // Initialize environment array.
     this.microbes = [];
     this.messages = [];
@@ -81,20 +81,20 @@ Environment.prototype.step = function() {
     // Reproduce microbes.
     while (this.microbes_to_reproduce.length > 0) {
         var microbe = this.microbes_to_reproduce[0];
-        var microbe_inner_info = this.microbes_to_reproduce_inner_info[0];
+        var microbe_data = this.microbes_to_reproduce_data[0];
         var index = this.microbes.indexOf(microbe);
         this.microbes_to_reproduce.splice(0, 1);
-        this.microbes_to_reproduce_inner_info.splice(0, 1);
+        this.microbes_to_reproduce_data.splice(0, 1);
         // If this microbe found we can proceed.
         // As we processLayerItem later (e.g. kill microbes) we should not have index = -1. But anyway.
         if (index !== -1) {
-            this.microbes[index].reproduce(microbe_inner_info);
+            this.microbes[index].reproduce(microbe_data);
         } else {
             console.log('Trying to reproduce microbe which doesnt exist any more.');
         }
     }
     // TODO: remove later. Just validation check.
-    if (this.microbes_to_reproduce_inner_info.length > 0) {
+    if (this.microbes_to_reproduce_data.length > 0) {
         console.log('Inner info for reproduced microbes should be empty. Something wrong.');
     }
     // "Process" environment.

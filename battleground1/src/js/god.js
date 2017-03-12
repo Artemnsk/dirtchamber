@@ -71,11 +71,84 @@ var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, mic
     // That's how microbe can give message to teammate microbes in radius=2 in any text format.
     // microbe_yell('asd');
 };
+
 var algorithm2 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
     var move_x = randomNumberFromRange(-1, 2);
     var move_y = randomNumberFromRange(-1, 2);
     microbe_move(move_x, move_y);
     if (Math.random() <= 0.005) {
         microbe_reproduce();
+    }
+};
+
+var algorithm3 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
+    var on_food = false;
+    for (var i = 0; i < messages.length; i++) {
+        try {
+            var data = JSON.parse(messages[i].text);
+            if (data.type == 'food') {
+                if(data.x == my_x && data.y == my_y) {
+                    on_food = true;
+                }
+                break;
+            }
+        } catch (e) {}
+    }
+    if (!on_food) {
+        // We can proceed with our tactic.
+        // First step.
+        if (my_inner_info == '') {
+            // Initial inner_info.
+            my_inner_info = 'init';
+        }
+        switch (my_inner_info) {
+            case 'init':
+                // We will move top.
+                microbe_set_inner_info('move_top');
+                // Reproduce new microbe.
+                microbe_reproduce({'inner_info': 'move_bottom'});
+                break;
+            case 'move_top':
+                // TODO: provide with map size somehow?
+                if (my_y == 200 - 1) {
+                    microbe_set_inner_info('move_right');
+                } else {
+                    microbe_reproduce({'inner_info': 'move_right', 'hitpoints': 42*200*2});
+                    microbe_move(0, 1);
+                }
+                break;
+            case 'move_bottom':
+                if (my_y == 0) {
+                    microbe_set_inner_info('move_right');
+                } else {
+                    microbe_reproduce({'inner_info': 'move_right', 'hitpoints': 42*200*2});
+                    microbe_move(0, -1);
+                }
+                break;
+            case 'move_right':
+                if (my_x == 200 - 1) {
+                    if (my_y < 90 || my_y > 110) {
+                        microbe_set_inner_info('diagonal');
+                    } else {
+                        microbe_set_inner_info('random');
+                    }
+                } else {
+                    microbe_move(1, 0);
+                }
+                break;
+            case 'diagonal':
+                if (my_x > 100 && Math.abs(100 - my_y) != 0) {
+                    microbe_move(-1, 1*Math.sign(100 - my_y));
+                } else {
+                    microbe_set_inner_info('move_right');
+                }
+            case 'random':
+            default:
+                var move_x = randomNumberFromRange(-1, 2);
+                var move_y = randomNumberFromRange(-1, 2);
+                microbe_move(move_x, move_y);
+                microbe_move(move_x, move_y);
+                break;
+        }
     }
 };
