@@ -3,7 +3,6 @@
  * @param x
  * @param y
  * @param env
- * @param strategy
  * @constructor
  */
 var Food = function(x, y, env, strategy) {
@@ -55,33 +54,27 @@ function reproduceAndPlaceNearRandomly() {
     if (Math.random() <= 0.005/*FOOD_REPRODUCTION_PROBABILITY*/) {
         var possiblePlacements = [];
         var vars = [-1, 0, 1];
-        for (var x in vars) {
-            for (var y in vars) {
-                if (!(x === 1 && y === 1)) {
-                    //if ( x != 1 && y != 1) - try it - it's funny!
-                    // checking if that cell is null (or undefined). Should we check if it is empty?
-                    if (this.env.env[this.x][this.y].microbes.length === 0) {
-                        if ((this.x + vars[x] >= 0 && this.x + vars[x] < this.env.configs.maxX) &&
-                            (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.configs.maxY)) {
-                            possiblePlacements.push({
-                                x: this.x + vars[x],
-                                y: this.y + vars[y]
-                            });
-                        }
-                    }
-                }
-            }
-        }
+        for (var x in vars)
+            for (var y in vars)
+                if ( !(x == 1 && y == 1))
+                //if ( x != 1 && y != 1) - try it - it's funny!
+                // checking if that cell is null (or undefined). Should we check if it is empty?
+                    if (this.env.env[this.x][this.y].microbes.length == 0)
+                      if ( (this.x + vars[x] >= 0 && this.x + vars[x] < this.env.configs.maxX) &&
+                        (this.y + vars[y] >= 0 && this.y + vars[y] < this.env.configs.maxY))
+                        possiblePlacements.push({
+                            x: this.x + vars[x],
+                            y: this.y + vars[y]
+                        });
+        if(possiblePlacements.length > 0){
+          var choosenPlacement = possiblePlacements[randomNumberFromRange(0, possiblePlacements.length - 1)];
 
-        if (possiblePlacements.length > 0) {
-            var choosenPlacement = possiblePlacements[randomNumberFromRange(0, possiblePlacements.length - 1)];
-
-            var food = new Food(choosenPlacement.x, choosenPlacement.y, this.env, {
-                type: 'direct'
-            });
-            this.env.env[choosenPlacement.x][choosenPlacement.y].food.push(food);
-            this.env.food.push(food);
-        }
+          var food = new Food(choosenPlacement.x, choosenPlacement.y, this.env, {
+              type: 'direct'
+          });
+          this.env.env[choosenPlacement.x][choosenPlacement.y].food.push(food);
+          this.env.food.push(food);
+      }
     }
 }
 
@@ -96,4 +89,4 @@ function reproduceUderYouself () {
         this.env.env[x][y].food.push(food);
         this.env.food.push(food);
     }
-}
+};

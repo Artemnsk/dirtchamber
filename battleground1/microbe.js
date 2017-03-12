@@ -25,7 +25,7 @@ Microbe.prototype.live = function() {
         // Secure operation to not allow player use the entire microbe object in algorithm.
         var already_moved = false;
         var microbe_move = function (move_x, move_y) {
-            if (already_moved === false) {
+            if (already_moved == false) {
                 already_moved = true;
                 that.move(move_x, move_y);
             } else {
@@ -34,7 +34,7 @@ Microbe.prototype.live = function() {
         };
         var already_reproduce_requested = false;
         var microbe_reproduce_request = function () {
-            if (already_reproduce_requested === false) {
+            if (already_reproduce_requested == false) {
                 already_reproduce_requested = true;
                 that.reproduce_request();
             } else {
@@ -43,7 +43,7 @@ Microbe.prototype.live = function() {
         };
         var already_yelled = false;
         var microbe_yell = function (text) {
-            if (already_yelled === false) {
+            if (already_yelled == false) {
                 already_yelled = true;
                 that.yell(text);
             } else {
@@ -71,7 +71,7 @@ Microbe.prototype.move = function(move_x, move_y) {
     move_x = Math.round(move_x);
     move_y = Math.round(move_y);
     // Check if are going to move.
-    if (move_x === 0 && move_y === 0) {
+    if (move_x == 0 && move_y == 0) {
         return;
     }
     // Normalisation.
