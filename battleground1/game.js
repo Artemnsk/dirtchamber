@@ -30,16 +30,16 @@ Game.prototype.settle = function() {
  * Returns true if game ends.
  */
 Game.prototype.processEnd = function() {
-    if (this.status === 'results') {
+    if (this.status == 'results') {
         return true;
     }
-    if (this.status === 'ended') {
+    if (this.status == 'ended') {
         this.endGame();
         this.status = 'results';
         return true;
     }
     // 0. Nobody wins.
-    if (this.env.microbes.length === 0) {
+    if (this.env.microbes.length == 0) {
         this.winner = null;
         this.status = 'ended';
         return true;
@@ -91,7 +91,7 @@ Game.prototype.processEnd = function() {
  */
 Game.prototype.endGame = function() {
     var text = "";
-    if (this.winner !== null) {
+    if (this.winner != null) {
         text = this.winner.nickname + " wins!";
     } else {
         text = "Game ended in a draw.";
