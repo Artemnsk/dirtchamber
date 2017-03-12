@@ -32,13 +32,13 @@ Microbe.prototype.live = function() {
                 //console.log(that.player.nickname + ': Move already being used on this step.')
             }
         };
-        var already_reproduced = false;
-        var microbe_reproduce = function () {
-            if (already_reproduced == false) {
-                already_reproduced = true;
-                that.reproduce();
+        var already_reproduce_requested = false;
+        var microbe_reproduce_request = function () {
+            if (already_reproduce_requested == false) {
+                already_reproduce_requested = true;
+                that.reproduce_request();
             } else {
-                //console.log(that.player.nickname + ': Reproduce already being used on this step.')
+                //console.log(that.player.nickname + ': Reproduce request already being used on this step.')
             }
         };
         var already_yelled = false;
@@ -52,7 +52,7 @@ Microbe.prototype.live = function() {
         };
         // Get messages.
         var messages = this.env.getMessages(this.x, this.y);
-        this.player.algorithm.call(null, messages, this.x, this.y, this.hitpoints, microbe_move, microbe_reproduce, microbe_yell);
+        this.player.algorithm.call(null, messages, this.x, this.y, this.hitpoints, microbe_move, microbe_reproduce_request, microbe_yell);
     }
 };
 
@@ -104,6 +104,16 @@ Microbe.prototype.move = function(move_x, move_y) {
 
     // Put the microbe into the environment cell.
     this.env.env[this.x][this.y].microbes.push(this);
+};
+
+/**
+ * Microbe 'asks' environment to reproduce himself.
+ * In fact that happens after all microbes 'live' to not let players abuse continuous microbes creation.
+ */
+Microbe.prototype.reproduce_request = function() {
+    if (this.env.microbes_to_reproduce.indexOf(this) === -1) {
+        this.env.microbes_to_reproduce.push(this);
+    }
 };
 
 /**

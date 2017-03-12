@@ -16,6 +16,8 @@
 var Environment = function (configs) {
     this.configs = configs;
     this.current_step = 0;
+    // Reproduce query.
+    this.microbes_to_reproduce = [];
     // Initialize environment array.
     this.microbes = [];
     this.messages = [];
@@ -74,6 +76,19 @@ Environment.prototype.step = function() {
     }
     for (var index in this.food) {
         this.food[index].live();
+    }
+    // Reproduce microbes.
+    while (this.microbes_to_reproduce.length > 0) {
+        var microbe = this.microbes_to_reproduce[0];
+        var index = this.microbes.indexOf(microbe);
+        this.microbes_to_reproduce.splice(0, 1);
+        // If this microbe found we can proceed.
+        // As we processLayerItem later (e.g. kill microbes) we should not have index = -1. But anyway.
+        if (index !== -1) {
+            this.microbes[index].reproduce();
+        } else {
+            console.log('Trying to reproduce microbe which doesnt exist any more.');
+        }
     }
     // "Process" environment.
     for (i in this.env) {
