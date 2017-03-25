@@ -29,7 +29,7 @@ var startGame = function () {
         'hitpoints_per_food': 1000,
         'message_radius': 2,
     };
-    var game = new Game(players, game_configs, env_configs);
+    game = new Game(players, game_configs, env_configs);
     game.settle();
     setInterval(function() {
         if (!game.processEnd()) {
@@ -41,7 +41,14 @@ var startGame = function () {
 };
 
 
-
+var stopGame = function () {
+    game.status = 'ended';
+    game.processEnd();
+    delete game;
+    //not sure if we must clear the canvas or not
+    var canvas = document.getElementById("Area");
+    canvas.width = canvas.width;
+};
 
 
 // Create players.
