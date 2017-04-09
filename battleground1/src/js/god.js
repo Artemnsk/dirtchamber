@@ -17,9 +17,9 @@ var startGame = function () {
     }
     $("#result").html('');
 
-    algorithm1 = new Function("messages", "my_x", "my_y", "my_hitpoints", "my_inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player1 *[name="algorithm"]').val());
-    algorithm2 = new Function("messages", "my_x", "my_y", "my_hitpoints", "my_inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player2 *[name="algorithm"]').val());
-    var player1 = new Player($('#player1 *[name="nickname"]').val(), $('#player1 *[name="color"]').val(), algorithm1);
+    algorithm1 = new Function("messages", "my_x", "my_y", "my_hitpoints", "inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player1 *[name="algorithm"]').val());
+    algorithm2 = new Function("messages", "my_x", "my_y", "my_hitpoints", "inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player2 *[name="algorithm"]').val());
+    var player1 = new Player($('#player1 *[name="nickname"]').val(), $('#player1 *[name="color"]').val(), algorithm3);
     var player2 = new Player($('#player2 *[name="nickname"]').val(), $('#player2 *[name="color"]').val(), algorithm2);
     var players = [player1, player2];
     var game_configs = {
@@ -61,7 +61,7 @@ var stopGame = function () {
 
 
 // Create players.
-var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
+var algorithm1 = function (messages, my_x, my_y, my_hitpoints, inner_info, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
     // 1. Parse message.
     var found_food = false;
     for (var i = 0; i < messages.length; i++) {
@@ -88,7 +88,7 @@ var algorithm1 = function (messages, my_x, my_y, my_hitpoints, microbe_move, mic
     // microbe_yell('asd');
 };
 
-var algorithm2 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
+var algorithm2 = function (messages, my_x, my_y, my_hitpoints, inner_info, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
     var move_x = randomNumberFromRange(-1, 2);
     var move_y = randomNumberFromRange(-1, 2);
     microbe_move(move_x, move_y);
@@ -97,7 +97,7 @@ var algorithm2 = function (messages, my_x, my_y, my_hitpoints, microbe_move, mic
     }
 };
 
-var algorithm3 = function (messages, my_x, my_y, my_hitpoints, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
+var algorithm3 = function (messages, my_x, my_y, my_hitpoints, inner_info, microbe_move, microbe_reproduce, microbe_yell, microbe_set_inner_info) {
     var on_food = false;
     for (var i = 0; i < messages.length; i++) {
         try {
@@ -113,11 +113,11 @@ var algorithm3 = function (messages, my_x, my_y, my_hitpoints, microbe_move, mic
     if (!on_food) {
         // We can proceed with our tactic.
         // First step.
-        if (my_inner_info == '') {
+        if (inner_info == '') {
             // Initial inner_info.
-            my_inner_info = 'init';
+			inner_info = 'init';
         }
-        switch (my_inner_info) {
+        switch (inner_info) {
             case 'init':
                 // We will move top.
                 microbe_set_inner_info('move_top');
