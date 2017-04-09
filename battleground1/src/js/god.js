@@ -9,6 +9,11 @@ function randomNumberFromRange(min,max){
 }
 
 var startGame = function () {
+    if (typeof game != 'undefined') {
+        stopGame();
+    }
+    $("#result").html('');
+
     algorithm1 = new Function("messages", "my_x", "my_y", "my_hitpoints", "my_inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player1 *[name="algorithm"]').val());
     algorithm2 = new Function("messages", "my_x", "my_y", "my_hitpoints", "my_inner_info", "microbe_move", "microbe_reproduce", "microbe_yell", "microbe_set_inner_info", $('#player2 *[name="algorithm"]').val());
     var player1 = new Player($('#player1 *[name="nickname"]').val(), $('#player1 *[name="color"]').val(), algorithm1);
@@ -29,7 +34,7 @@ var startGame = function () {
         'hitpoints_per_food': 1000,
         'message_radius': 2,
     };
-    var game = new Game(players, game_configs, env_configs);
+    game = new Game(players, game_configs, env_configs);
     game.settle();
     setInterval(function() {
         if (!game.processEnd()) {
@@ -41,7 +46,14 @@ var startGame = function () {
 };
 
 
-
+var stopGame = function () {
+    game.status = 'ended';
+    game.processEnd();
+    delete game;
+    //not sure if we must clear the canvas or not
+    var canvas = document.getElementById("Area");
+    canvas.width = canvas.width;
+};
 
 
 // Create players.
