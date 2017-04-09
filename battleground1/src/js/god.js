@@ -8,6 +8,9 @@ function randomNumberFromRange(min,max){
     return Math.floor(Math.random()*(max-min)+min);
 }
 
+// Used to store setInterval of startGame().
+var gameInterval = null;
+
 var startGame = function () {
     if (typeof game != 'undefined') {
         stopGame();
@@ -36,7 +39,7 @@ var startGame = function () {
     };
     game = new Game(players, game_configs, env_configs);
     game.settle();
-    setInterval(function() {
+	gameInterval = setInterval(function() {
         if (!game.processEnd()) {
             // TODO: do it without env middleware?
             game.env.step();
@@ -53,6 +56,7 @@ var stopGame = function () {
     //not sure if we must clear the canvas or not
     var canvas = document.getElementById("Area");
     canvas.width = canvas.width;
+    clearInterval(gameInterval);
 };
 
 
